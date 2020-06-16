@@ -24,6 +24,7 @@
     "tesseract.js": "^2.1.1",
     "typescript": "^3.9.5",
     "vue": "^2.6.11",
+    "vue-property-decorator": "^8.5.0",
     "webpack": "~4.42.1"
   },
   "description": "> A bare minimum project structure to get started developing with [`electron-webpack`](https://github.com/electron-userland/electron-webpack).",
