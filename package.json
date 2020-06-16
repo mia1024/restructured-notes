@@ -1,0 +1,44 @@
+{
+  "name": "restructured-notes",
+  "version": "0.0.1",
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "electron-webpack dev",
+    "compile": "electron-webpack",
+    "dist": "yarn compile && electron-builder",
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+  },
+  "dependencies": {
+    "source-map-support": "^0.5.16"
+  },
+  "devDependencies": {
+    "electron": "8.2.0",
+    "electron-builder": "^22.4.1",
+    "electron-webpack": "^2.8.2",
+    "electron-webpack-ts": "^4.0.1",
+    "electron-webpack-vue": "^2.4.0",
+    "eslint-plugin-html": "^6.0.2",
+    "fabric": "^3.6.3",
+    "jquery": "^3.5.1",
+    "mathjax": "^3.0.5",
+    "tesseract.js": "^2.1.1",
+    "typescript": "^3.9.5",
+    "vue": "^2.6.11",
+    "webpack": "~4.42.1"
+  },
+  "description": "> A bare minimum project structure to get started developing with [`electron-webpack`](https://github.com/electron-userland/electron-webpack).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mia1024/restructured-notes.git"
+  },
+  "keywords": [
+    "note",
+    "notes"
+  ],
+  "author": "Mia Celeste",
+  "bugs": {
+    "url": "https://github.com/mia1024/restructured-notes/issues"
+  },
+  "homepage": "https://github.com/mia1024/restructured-notes#readme"
+}
