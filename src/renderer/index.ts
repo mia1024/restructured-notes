@@ -5,6 +5,6 @@ if (module.hot) {
   module.hot.accept();
 }
 
-let v = new Vue({
+new Vue({
 	render: h=>h(App),
 }).$mount('#app')
