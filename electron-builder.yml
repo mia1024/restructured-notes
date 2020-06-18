@@ -1,0 +1,7 @@
+copyright: "Copyright © 2020 Jerry Wang"
+productName: "Restructured Notes"
+appId: "com.restructurednotes.app"
+directories:
+  buildResources: "src/assets"
+
+
