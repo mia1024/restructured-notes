@@ -27,7 +27,7 @@
     "vue-property-decorator": "^8.5.0",
     "webpack": "~4.42.1"
   },
-  "description": "> A bare minimum project structure to get started developing with [`electron-webpack`](https://github.com/electron-userland/electron-webpack).",
+  "description": "A (hopefully) better note taking app",
   "main": "index.js",
   "repository": {
     "type": "git",

@@ -10,10 +10,18 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 let mainWindow
 
 function createMainWindow() {
-  const window = new BrowserWindow({webPreferences: {nodeIntegration: true}})
+  const window = new BrowserWindow({
+    webPreferences: {
+      nodeIntegration: true
+    },
+    show: false
+        //frame: false
+  }
+  )
 
   if (isDevelopment) {
     window.webContents.openDevTools()
+
   }
 
   if (isDevelopment) {
@@ -31,11 +39,18 @@ function createMainWindow() {
     mainWindow = null
   })
 
+  window.once('ready-to-show', () => {
+    window.show()
+  })
+
   window.webContents.on('devtools-opened', () => {
     window.focus()
     setImmediate(() => {
       window.focus()
     })
+    window.webContents.devToolsWebContents.executeJavaScript(
+        'DevToolsAPI.showPanel("chrome-extension://vue-js-devtoolsVue")',
+    );
   })
 
   return window
@@ -44,9 +59,9 @@ function createMainWindow() {
 // quit application when all windows are closed
 app.on('window-all-closed', () => {
   // on macOS it is common for applications to stay open until the user explicitly quits
-  if (process.platform !== 'darwin') {
+  //if (process.platform !== 'darwin') {
     app.quit()
-  }
+  //}
 })
 
 app.on('activate', () => {
