@@ -48,6 +48,9 @@ function createMainWindow() {
     setImmediate(() => {
       window.focus()
     })
+    window.webContents.devToolsWebContents.executeJavaScript(
+        'DevToolsAPI.showPanel("chrome-extension://vue-js-devtoolsVue")',
+    );
   })
 
   return window
