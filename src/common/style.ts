@@ -1,10 +1,10 @@
 import {StandardProperties, StandardPropertiesHyphen, VendorProperties, VendorPropertiesHyphen} from "csstype";
 
-export default interface Style extends
+declare interface CSS extends
     StandardPropertiesHyphen,
     StandardProperties,
     VendorProperties,
     VendorPropertiesHyphen
 {}
 
-export {Style}
+export default CSS
