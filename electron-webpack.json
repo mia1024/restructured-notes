@@ -1,7 +1,8 @@
 {
   "title":"Restructured Notes",
   "renderer":{
-  	"template": "src/renderer/index.html"
+  	"template": "src/renderer/index.html",
+    "webpackConfig": "webpack.renderer.additions.js"
   }
 }
 

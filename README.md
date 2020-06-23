@@ -46,7 +46,7 @@ There should be at least one commit per checkbox. After completion of each check
 			- [ ] URL scheme registration 
 			- [ ] plain text editor for notes
 			- [ ] Directory/notebook tree viewer
-		- [ ] Launcher icon
+		- [x] Launcher icon (e37cd84)
 		- [ ] Dialog for detection warning
 		- [ ] i18n
 	- Docs

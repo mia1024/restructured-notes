@@ -1,24 +1,34 @@
-'use strict'
-
-import {app, BrowserWindow} from 'electron'
+import {app, BrowserWindow, nativeTheme, screen} from 'electron'
 import * as path from 'path'
 import {format as formatUrl} from 'url'
 
-const os = require("os")
-
 const isDevelopment = process.env.NODE_ENV !== 'production'
+if (isDevelopment) {
+    app.setName('Restructured Notes')
+    let dataDir = path.join(app.getPath('appData'), 'Restructured Notes')
+    let fs = require('fs')
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir)
+    //app.setPath('userData',path.join(app.getPath('appData'),'Restructured Notes'))
+}
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
-let mainWindow
+let mainWindow: BrowserWindow | null;
+const isMacOS = process.platform === 'darwin'
 
 
 function createMainWindow() {
+    const {width, height} = screen.getPrimaryDisplay().size
     const window = new BrowserWindow({
             webPreferences: {
-                nodeIntegration: true
+                nodeIntegration: true,
+                additionalArguments: [nativeTheme.shouldUseDarkColors.toString()]
             },
             show: false,
-            //frame: false
+            frame: !isMacOS,
+            titleBarStyle: isMacOS ? "hiddenInset" : undefined,
+            width: width * 0.8,
+            height: height * 0.8
+
             //icon: path.join(__dirname, "../assets/icon" + (os.platform() === "darwin" ? ".icns" : ".png"))
         }
     )
@@ -59,9 +69,9 @@ function createMainWindow() {
 // quit application when all windows are closed
 app.on('window-all-closed', () => {
     // on macOS it is common for applications to stay open until the user explicitly quits
-    //if (process.platform !== 'darwin') {
-    app.quit()
-    //}
+    if (!isMacOS) {
+        app.quit()
+    }
 })
 
 app.on('activate', () => {
