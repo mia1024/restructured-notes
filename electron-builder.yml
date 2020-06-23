@@ -1,6 +1,6 @@
 copyright: "Copyright © 2020 Mia Celeste"
 productName: "Restructured Notes"
-appId: "com.restructurednotes.app"
+appId: "com.restructurednotes.restructurednotes"
 directories:
   buildResources: "src/assets"
 
