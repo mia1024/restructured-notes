@@ -1,11 +1,11 @@
 import expect from 'expect'
 import {FileBasedConfig} from "src/common";
-import {tmpdir} from "os";
+import {tmpdir} from "os"
 import {join} from 'path'
 import {readFileSync, writeFileSync} from "fs";
 
 
-describe("src/config.ts",()=>{
+describe("src/common/config.ts",()=>{
     class TestConfig extends FileBasedConfig{
         public field1='a'
         public field2='b'
