@@ -1,5 +1,5 @@
 <template>
-    <v-app app :style="colorScheme">
+    <v-app app :style="globalStyle" >
         <toolbar/>
 
         <v-main>
@@ -11,23 +11,28 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator'
-    import Toolbar from "./components/Toolbar.vue";
+    import Toolbar from "@components/Toolbar.vue";
 
 
     @Component({
         components: {Toolbar: Toolbar}
     })
     export default class App extends Vue {
+        get globalStyle(){
+            let global= {...(this.$store.state.config.UIStyle.globalStyle)}
+            Object.assign(global,this.colorScheme)
+            return global
+        }
 
         get colorScheme() {
-            let config = this.$store.state.config
-            let cssVars: any = {}
+            const config = this.$store.state.config
+            const cssVars: any = {}
             let theme;
 
             if (config.useDarkMode) {
-                theme = config.style.UIStyle.darkTheme
+                theme = config.UIStyle.darkTheme
             } else {
-                theme = config.style.UIStyle.lightTheme
+                theme = config.UIStyle.lightTheme
             }
             cssVars['--foreground-color'] = theme.foregroundColor
             cssVars['--background-color'] = theme.backgroundColor

@@ -1,4 +1,4 @@
-import {Style as CSS} from "./style";
+import {CSS} from "src/common";
 import {existsSync, readFileSync, writeFileSync} from 'fs'
 import {join as joinPath} from 'path'
 
@@ -24,6 +24,8 @@ switch (process.type) {
         configDirPath = os.tmpdir()
     }
 }
+const configFilePath=joinPath(configDirPath,'config.yml')
+export {configDirPath,configFilePath}
 
 
 class ColorScheme {
@@ -41,28 +43,31 @@ class ColorScheme {
 }
 
 
-class Style {
-    UIStyle = new UIStyle
-}
-
 export class FileBasedConfig {
     save(path?: string): void {
-        if (path === undefined) path = joinPath(configDirPath, 'config.yml')
-        let serialized = YAML.stringify(this)
+        if (path === undefined) path = configFilePath
+        let serialized = YAML.stringify(this, {indent: 4, simpleKeys: true})
         writeFileSync(path, serialized)
     }
 
     loadFromDisk(path?: string): void {
-        if (path === undefined) path = joinPath(configDirPath, 'config.yml')
+        if (path === undefined) path = configFilePath
         let config = YAML.parse(readFileSync(path, {encoding: 'utf8'}))
         Object.assign(this, merge(this, config))
     }
 
     constructor() {
-        if (existsSync(joinPath(configDirPath, 'config.yml'))) {
-            if (process.env.NODE_ENV === 'production')
+        if (existsSync(configFilePath))
+            //if (process.env.NODE_ENV === 'production')
+            try {
                 this.loadFromDisk()
-        }
+            } catch (e) {
+                console.error('Error while parsing configuration file: ', e)
+                throw e
+                //console.log(JSON.stringify(e))
+            }
+        // else
+        //     console.log('bypassing config.yml in development')
 
         // always update with the latest copy of default configs
         if (process.type === 'renderer')
@@ -74,15 +79,40 @@ export class FileBasedConfig {
 
 // ---------------------- Default Settings -------------------
 
-export default class UserConfig extends FileBasedConfig {
-    public style = new Style
-    public useDarkMode: boolean = window.process.argv[-1] === 'true'
+
+export class UserConfig extends FileBasedConfig {
+    public UIStyle = new UIStyle
+    public useDarkMode: boolean;
+
+    constructor() {
+        super()
+        switch (process.type) {
+            case 'renderer':
+                this.useDarkMode = window.process.argv[-1] === 'true'
+                break
+            case 'browser':
+                let electron = require('electron')
+                this.useDarkMode = electron.nativeTheme.shouldUseDarkColors
+                break
+            default:
+                this.useDarkMode = true
+        }
+    }
 }
 
+
 class UIStyle {
+    public globalStyle: CSS = {
+        'font-family': '"Roboto Mono", "Courier New", Courier, monospaced',
+        'font-size': '16px',
+        'font-weight': 300,
+    }
+
     public toolbarStyle: CSS = {
-        'font-family': '"Courier New", monospaced',
-        'font-size': '16px'
+        'font-family': 'inherit',
+        'font-size': 'inherit',
+        'color': 'inherit',
+        'background-color': 'inherit'
     };
     public darkTheme = new ColorScheme(
         {

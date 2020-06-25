@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import Style from './style'
-import UserConfig from './config'
+import {CSS,UserConfig} from 'src/common'
 
 
 Vue.use(Vuex)
@@ -11,24 +10,29 @@ export class GlobalState {
     public title: string = "Restructured Notes"
 }
 
-export interface updateElementStyleOptions {
-    target: "toolbar"
-    style: Style,
+export interface UpdateUIStyleOptions {
+    target: "toolbar" | "global"
+    style: CSS,
 }
 
 const mutations = {
     setDarkMode(state: GlobalState, to: boolean) {
         state.config.useDarkMode = to;
     },
-    updateElementStyle(state: GlobalState, option: updateElementStyleOptions) {
+
+    updateUIStyle(state: GlobalState, option: UpdateUIStyleOptions) {
         let target;
         switch (option.target) {
             case "toolbar":
-                target = state.config.style.UIStyle.toolbarStyle
+                target = state.config.UIStyle.toolbarStyle
+                break
+            case "global":
+                target = state.config.UIStyle.globalStyle
                 break
             default:
                 target={}
-                console.warn("Invalid target in updateElementStyle")
+                console.error("Invalid target in updateUIStyle")
+                return
         }
 
         Object.assign(target, option.style)

@@ -3,6 +3,9 @@
   "renderer":{
   	"template": "src/renderer/index.html",
     "webpackConfig": "webpack.renderer.additions.js"
+  },
+  "main": {
+    "webpackConfig": "webpack.main.additions.js"
   }
 }
 
