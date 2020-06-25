@@ -7,23 +7,23 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator'
-    import Style from "../style";
+    import {UpdateUIStyleOptions} from "../store"
+    import {CSS} from "src/common";
 
     import platform from "os"
 
     @Component
     export default class Toolbar extends Vue {
-        get style(): Style {
-            if (this.isMacOS) {
-                this.$store.commit('updateElementStyle',{
-                    target:'toolbar',
-                    style:{
-                        '-webkit-app-region':'drag'
+        get style(): CSS {
+            if (this.isMacOS)
+                this.$store.commit('updateUIStyle', {
+                    target: 'toolbar',
+                    style: {
+                        '-webkit-app-region': 'drag',
                     }
-                })
-                return this.$store.state.config.style.UIStyle.toolbarStyle
-            } else
-                return this.$store.state.config.style.UIStyle.toolbarStyle
+                } as UpdateUIStyleOptions)
+
+            return this.$store.state.config.UIStyle.toolbarStyle
         }
 
         get isMacOS(): boolean {
