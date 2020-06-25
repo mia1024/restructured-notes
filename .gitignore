@@ -4,3 +4,5 @@ node_modules/
 thumbs.db
 .idea/
 *.env
+*.js
+*.js.map
