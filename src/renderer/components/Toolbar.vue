@@ -20,6 +20,7 @@
                     target: 'toolbar',
                     style: {
                         '-webkit-app-region': 'drag',
+                        'user-select':'none'
                     }
                 } as UpdateUIStyleOptions)
 

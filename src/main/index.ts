@@ -1,8 +1,8 @@
 import {app, BrowserWindow, nativeTheme, screen, dialog, nativeImage, shell} from 'electron'
 import * as path from 'path'
 import {format as formatUrl} from 'url'
-import {configFilePath, UserConfig} from "src/common";
-import {unlinkSync} from "fs";
+import {configDirPath, configFilePath, UserConfig, initRepoAndCommitAll} from "src/common";
+import {existsSync, mkdirSync, unlinkSync} from "fs";
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 if (isDevelopment) {
@@ -89,7 +89,18 @@ app.on('activate', () => {
 })
 
 // create main BrowserWindow when electron is ready
-app.on('ready', () => {
+app.on('ready', async () => {
+    if (!existsSync(configDirPath)) {
+        // setting up the user data directory
+        mkdirSync(configDirPath, {recursive: true, mode: 0o700})
+        new UserConfig().save()
+        try {
+            await initRepoAndCommitAll(configDirPath)
+        } catch (e) {
+
+            dialog.showErrorBox('Error',e.toString())
+        }
+    }
 
     let config: UserConfig;
     try {
@@ -120,6 +131,7 @@ app.on('ready', () => {
             }
         })
     }
+
     mainWindow = createMainWindow()
 })
 
