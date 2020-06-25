@@ -1,18 +1,18 @@
 import expect from 'expect'
-import {FileBasedConfig} from "../src/renderer/config";
+import {FileBasedConfig} from "src/common";
 import {tmpdir} from "os";
 import {join} from 'path'
-import {readFileSync} from "fs";
+import {readFileSync, writeFileSync} from "fs";
 
 
-describe("config.ts",()=>{
+describe("src/config.ts",()=>{
     class TestConfig extends FileBasedConfig{
         public field1='a'
         public field2='b'
     }
-    let config=new TestConfig()
     const filePath=join(tmpdir(),'testConfig.yml')
     it("saves settings to the disk",()=>{
+        let config=new TestConfig()
         expect(config.field1).toBe('a')
         expect(config.field2).toBe('b')
         config.field2='c'
@@ -22,9 +22,17 @@ describe("config.ts",()=>{
     })
 
     it("loads settings from the disk",()=>{
+        let config=new TestConfig()
+        writeFileSync(filePath,`field1: a\nfield2: c\n`)
         config.loadFromDisk(filePath)
         expect(config.field1).toBe('a')
         expect(config.field2).toBe('c')
         expect(config instanceof TestConfig).toBeTruthy()
+    })
+
+    it('throws an error with broken configuration',()=>{
+        let config=new TestConfig()
+        writeFileSync(filePath,`a: \n  - b\n c\n`)
+        expect(()=>config.loadFromDisk(filePath)).toThrowError()
     })
 })

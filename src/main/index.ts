@@ -1,6 +1,8 @@
-import {app, BrowserWindow, nativeTheme, screen} from 'electron'
+import {app, BrowserWindow, nativeTheme, screen, dialog, nativeImage, shell} from 'electron'
 import * as path from 'path'
 import {format as formatUrl} from 'url'
+import {configFilePath, UserConfig} from "src/common";
+import {unlinkSync} from "fs";
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 if (isDevelopment) {
@@ -14,6 +16,11 @@ if (isDevelopment) {
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null;
 const isMacOS = process.platform === 'darwin'
+
+const appIcon = nativeImage.createFromPath('src/assets/icon.png')
+if (isMacOS) {
+    app.dock.setIcon(appIcon)
+}
 
 
 function createMainWindow() {
@@ -83,5 +90,36 @@ app.on('activate', () => {
 
 // create main BrowserWindow when electron is ready
 app.on('ready', () => {
+
+    let config: UserConfig;
+    try {
+        config = new UserConfig
+    } catch (e) {
+        dialog.showMessageBox({
+            type: 'error',
+            title: 'Invalid Configuration',
+            message: 'Unable to load the current configuration file due to the following error:',
+            buttons: ["Quit", "Revert to default configs"],
+            defaultId: 0,
+            cancelId: 0,
+            detail: e.toString(),
+            noLink: true,
+            checkboxLabel: "Show config.yml in file manager?",
+            checkboxChecked: true
+        }).then(ans => {
+            console.log(ans)
+            if (ans.checkboxChecked)
+                shell.showItemInFolder(configFilePath)
+
+            if (ans.response === 0)
+                app.quit()
+            else {
+                unlinkSync(configFilePath)
+                config = new UserConfig
+                config.save()
+            }
+        })
+    }
     mainWindow = createMainWindow()
 })
+

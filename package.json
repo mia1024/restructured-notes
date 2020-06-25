@@ -8,9 +8,11 @@
     "compile": "electron-webpack",
     "dist": "yarn compile && electron-builder",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "test": "mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts"
+    "test": "mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts",
+    "compile-dependencies": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "nodegit": "^0.26.5",
     "source-map-support": "^0.5.16"
   },
   "devDependencies": {
@@ -19,12 +21,14 @@
     "@types/expect": "^24.3.0",
     "@types/mocha": "^7.0.2",
     "@types/node": "12",
+    "@types/nodegit": "^0.26.5",
     "@vue/test-utils": "^1.0.3",
     "csstype": "^2.6.10",
     "deepmerge": "^4.2.2",
     "electron": "^8.3",
     "electron-builder": "^22.4.1",
     "electron-mocha": "^8.2.2",
+    "electron-rebuild": "^1.11.0",
     "electron-webpack": "^2.8.2",
     "electron-webpack-ts": "^4.0.1",
     "electron-webpack-vue": "^2.4.0",
@@ -37,7 +41,7 @@
     "jsdom-global": "^3.0.2",
     "mathjax": "^3.0.5",
     "mocha": "^8.0.1",
-    "mochapack": "^2.0.0",
+    "mochapack": "^2.0.1",
     "node-sass": "^4.14.1",
     "raw-loader": "^4.0.1",
     "sass": "^1.26.8",
