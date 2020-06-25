@@ -24,8 +24,10 @@ switch (process.type) {
         configDirPath = os.tmpdir()
     }
 }
-const configFilePath=joinPath(configDirPath,'config.yml')
-export {configDirPath,configFilePath}
+configDirPath = joinPath(configDirPath, 'User Data')
+
+const configFilePath = joinPath(configDirPath, 'config.yml')
+export {configDirPath, configFilePath}
 
 
 class ColorScheme {
@@ -69,11 +71,6 @@ export class FileBasedConfig {
         // else
         //     console.log('bypassing config.yml in development')
 
-        // always update with the latest copy of default configs
-        if (process.type === 'renderer')
-            window.addEventListener('beforeunload', e => {
-                this.save()
-            })
     }
 }
 
@@ -82,6 +79,7 @@ export class FileBasedConfig {
 
 export class UserConfig extends FileBasedConfig {
     public UIStyle = new UIStyle
+    public git = new Git
     public useDarkMode: boolean;
 
     constructor() {
@@ -98,6 +96,12 @@ export class UserConfig extends FileBasedConfig {
                 this.useDarkMode = true
         }
     }
+}
+
+class Git {
+    public name: string = ""
+    public email: string = ""
+    public gpgsign: boolean = false
 }
 
 

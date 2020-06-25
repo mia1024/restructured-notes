@@ -43,6 +43,7 @@
     "mocha": "^8.0.1",
     "mochapack": "^2.0.1",
     "node-sass": "^4.14.1",
+    "openpgp": "^4.10.4",
     "raw-loader": "^4.0.1",
     "sass": "^1.26.8",
     "sass-loader": "^8.0.2",
