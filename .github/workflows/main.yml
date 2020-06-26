@@ -69,3 +69,29 @@ jobs:
         run: ./setup_env
       - name: Run test
         run: yarn test
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.13.0'
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}
+      - name: Run setup_env script
+        run: ./setup_env
+      - name: Run test
+        run: yarn test
