@@ -1,9 +1,6 @@
 #!/bin/bash
 
 cd "${0%/*}"
-if [ -d node_modules ]; then
-  rm -rf node_modules
-fi
 yarn
 yarn compile-dependencies
 if [ $? -ne 0 ]; then
