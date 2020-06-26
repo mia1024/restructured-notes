@@ -28,6 +28,7 @@ jobs:
           node-version: '12.13.0'
 
       - name: Cache node_modules
+        uses: actions/cache@v2
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
