@@ -48,7 +48,7 @@ export async function commitConfigFileWithSystemSignature(repoPath: string) {
     }
 }
 
-export async function isConfigModified(repoPath: string): Promise<boolean> {
+export async function isConfigModified(repoPath: string) {
     try {
         let repo = await Git.Repository.open(repoPath)
         let status = await Git.Status.file(repo, 'config.yml')
