@@ -2,15 +2,50 @@
 
 cd "${0%/*}"
 yarn
-yarn compile-dependencies
-if [ $? -ne 0 ]; then
-  echo "yarn compile-dependencies failed. Trying electron-rebuild instead..."
-  $(npm bin)/electron-rebuild
+
+rebuild_nodegit() {
+  yarn compile-dependencies
   if [ $? -ne 0 ]; then
-    echo "Cannot compile the binary"
-    exit 1
+    echo "yarn compile-dependencies failed. Trying electron-rebuild instead..."
+    $(npm bin)/electron-rebuild
+    if [ $? -ne 0 ]; then
+      echo "Cannot compile nodegit"
+      exit 1
+    fi
+  fi
+}
+
+if [ ! -f "node_modules/nodegit/.rebuilt-for-electron" ]; then
+  rebuild_nodegit
+  touch "node_modules/nodegit/.rebuilt-for-electron"
+else
+  if [ "$1" != '-f' ]; then
+    echo 'Skipping nodegit as it has already been built for electron.'
+    echo 'run setup_env -f to force rebuild'
+    echo
+  else
+    rebuild_nodegit
   fi
 fi
 
 # Canvas is required by jsdom for testing
-npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
+
+if [ ! -f "node_modules/canvas/.rebuilt-for-electron" ]; then
+  npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
+  if [ $? -ne 0 ]; then
+    echo 'cannot rebuild canvas'
+    exit 1
+  fi
+  touch "node_modules/canvas/.rebuilt-for-electron"
+else
+  if [ "$1" != '-f' ]; then
+    echo 'Skipping canvas as it has already been built for electron.'
+    echo 'run setup_env -f to force rebuild'
+  else
+    npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
+    if [ $? -ne 0 ]; then
+      echo 'cannot rebuild canvas'
+      exit 1
+    fi
+  fi
+fi
