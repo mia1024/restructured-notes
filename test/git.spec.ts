@@ -32,6 +32,8 @@ describe("src/common/git.ts", () => {
         execSync(`
          git init
          git config commit.gpgsign false
+         git config user.name ${autoCommitName}
+         git config user.email ${autoCommitEmail}
          git add .
          git commit -m test
          `, {cwd: testDir,encoding:'utf8'})
