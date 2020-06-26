@@ -70,21 +70,23 @@ jobs:
             node_modules
             **/node_modules
             ~/.npm
+            /usr/local/opt
+            /usr/local/Cellar
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
       - name: Setup homebrew
-        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+#        if: steps.cache-node_modules.outputs.cache-hit != 'true'
         run: bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
       - name: Install Dependencies
-        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+#        if: steps.cache-node_modules.outputs.cache-hit != 'true'
         run: brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman
 
       - name: Run setup_env script
-        if: steps.cache-node_modules.outputs.cache-hit != 'true'
+#        if: steps.cache-node_modules.outputs.cache-hit != 'true'
         run: ./setup_env
       - name: Run test
         run: yarn test
