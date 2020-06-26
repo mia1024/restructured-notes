@@ -80,6 +80,7 @@ export class FileBasedConfig {
 export class UserConfig extends FileBasedConfig {
     public UIStyle = new UIStyle
     public git = new Git
+    public gpg = new GPG
     public useDarkMode: boolean;
 
     constructor() {
@@ -102,8 +103,14 @@ class Git {
     public name: string = ""
     public email: string = ""
     public gpgsign: boolean = false
+    public useGPG: boolean = false
 }
 
+class GPG {
+    signKey: string = ""
+    encryptKey: string = ""
+    executable: string = "gpg"
+}
 
 class UIStyle {
     public globalStyle: CSS = {
