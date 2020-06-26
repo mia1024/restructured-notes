@@ -103,14 +103,20 @@ jobs:
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
-      - name: Download GTK2 and libjpeg
+      - name: Download GTK2
         shell: powershell
         run: |
           wget http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip -OutFile gtk.zip
           expand-archive gtk.zip
           mv gtk C:\GTK
-          mkdir C:\libjpeg-turbo64
-          wget https://sourceforge.net/projects/libjpeg-turbo/files/2.0.5/libjpeg-turbo-2.0.5-vc64.exe/download -OutFile C:\libjpeg-turbo64\/libjpeg-turbo-2.0.5-vc64.exe
+
+      - name: Install libjpeg
+        run: |
+          git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git
+          cd libjpeg-turbo
+          cmake -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Release .
+          nmake
+          nmake install
 
       - name: Run setup_env script
         run: ./setup_env
