@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Test
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -19,13 +19,29 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: checkout repo
+      - name: Checkout repo
         uses: actions/checkout@v2
       
-      - name: setup node
+      - name: Setup node
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '12'
-        
-      - run: ./setup_env
-      - run: yarn test
+          node-version: '12.13.0'
+
+      - name: Cache node_modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys:
+            - ${{ runner.os }}-yarn-
+      - name: Install linux dependencies
+        run: >
+          sudo apt-get -y install build-essential clang libdbus-1-dev libgtk-3-dev \
+          libnotify-dev libgnome-keyring-dev \
+          libasound2-dev libcap-dev libcups2-dev libxtst-dev \
+          libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+          gperf bison python-dbusmock openjdk-8-jre
+
+      - name: Run setup_env script
+        run: ./setup_env
+      - name: Run test
+        run: yarn test
