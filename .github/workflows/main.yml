@@ -6,7 +6,8 @@ on:
     branches: [ dev ]
 
 defaults:
-  shell: bash
+  run:
+    shell: bash
 
 jobs:
   linux:
