@@ -71,7 +71,7 @@ jobs:
             ${{ runner.os }}
 
       - name: Setup homebrew
-        run: $(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)
+        run: bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
       - name: Install Dependencies
         run: brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman
@@ -103,12 +103,14 @@ jobs:
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
-      - name: Download GTK2
+      - name: Download GTK2 and libjpeg
         shell: powershell
         run: |
           wget http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip -OutFile gtk.zip
           expand-archive gtk.zip
           mv gtk C:\GTK
+          mkdir C:\libjpeg-turbo64
+          wget https://sourceforge.net/projects/libjpeg-turbo/files/2.0.5/libjpeg-turbo-2.0.5-vc64.exe/download -OutFile C:\libjpeg-turbo64\/libjpeg-turbo-2.0.5-vc64.exe
 
       - name: Run setup_env script
         run: ./setup_env
