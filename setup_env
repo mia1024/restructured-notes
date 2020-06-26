@@ -5,16 +5,15 @@ if [ -d node_modules ]; then
   rm -rf node_modules
 fi
 yarn
-cd node_modules/nodegit/build
-mv Release ../Release_72
-cd - >/dev/null
-echo "compiling dependencies with yarn compile-dependencies..."
 yarn compile-dependencies
 if [ $? -ne 0 ]; then
   echo "yarn compile-dependencies failed. Trying electron-rebuild instead..."
   $(npm bin)/electron-rebuild
+  if [ $? -ne 0 ]; then
+    echo "Cannot compile the binary"
+    exit 1
+  fi
 fi
-cd - >/dev/null
-mv Release Release_76
-mv ../Release_72 .
-ln -s Release_76 Release
+
+# Canvas is required by jsdom for testing
+npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
