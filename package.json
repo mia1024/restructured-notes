@@ -8,7 +8,7 @@
     "compile": "electron-webpack",
     "dist": "yarn compile && electron-builder",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
-    "test": "mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts",
+    "test": "./switch_binary.sh 72 && mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts && ./switch_binary.sh 76",
     "compile-dependencies": "electron-builder install-app-deps"
   },
   "dependencies": {

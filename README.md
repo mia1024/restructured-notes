@@ -184,16 +184,20 @@ There should be at least one commit per checkbox. After completion of each check
 	- [ ] web page
 	- [ ] Package and release!
 
-# Run app
+# Develop the app
 
-```bash
+```shell script
 git clone https://github.com/mia1024/restructured-notes
 cd restructured-notes
-yarn 
+./setup_env
 yarn dev
 ```
 
-If you get any DLL error, you may need to run `yarn compile-dependencies` before running `yarn dev`
+# Run test
+
+```shell script
+yarn test
+```
 
 # License
 
