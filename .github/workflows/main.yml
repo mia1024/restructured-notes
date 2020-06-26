@@ -111,6 +111,7 @@ jobs:
           mv gtk C:\GTK
 
       - name: Install libjpeg
+        shell: powershell
         run: |
           git clone https://github.com/libjpeg-turbo/libjpeg-turbo.git
           cd libjpeg-turbo
