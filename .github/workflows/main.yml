@@ -1,29 +1,19 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Test
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   linux:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
       
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v2
         with:
           node-version: '12.13.0'
 
@@ -49,6 +39,32 @@ jobs:
           libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib curl
           gperf bison python-dbusmock openjdk-8-jre
 
+      - name: Run setup_env script
+        run: ./setup_env
+      - name: Run test
+        run: yarn test
+  macOS:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12.13.0'
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+            ${{ runner.os }}
       - name: Run setup_env script
         run: ./setup_env
       - name: Run test
