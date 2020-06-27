@@ -7,14 +7,14 @@ import {initRepoAndCommitAll, autoCommitEmail, autoCommitName, isConfigModified}
 import {execSync} from "child_process";
 
 describe("src/common/git.ts", () => {
-    let testDir:string;
+    let testDir: string;
 
-    beforeEach(()=>{
-        testDir = join(tmpdir(), 'test-rstnotes','test'+Math.random())
-        mkdirSync(testDir,{recursive:true})
+    beforeEach(() => {
+        testDir = join(tmpdir(), 'test-rstnotes', 'test' + Math.random())
+        mkdirSync(testDir, {recursive: true})
     })
-    afterEach(()=>{
-        rmdirSync(testDir,{recursive:true})
+    afterEach(() => {
+        rmdirSync(testDir, {recursive: true})
     })
 
     it("creates initial commit correctly", async () => {
@@ -27,7 +27,7 @@ describe("src/common/git.ts", () => {
         expect(commit.message()).toBe('Initial commit')
         expect(commit.parentcount()).toBe(0)
     })
-    it("detects change in config.yml",async ()=>{
+    it("detects change in config.yml", async () => {
         writeFileSync(join(testDir, 'config.yml'), 'data 1')
         execSync(`
          git init
@@ -36,7 +36,11 @@ describe("src/common/git.ts", () => {
          git config user.email ${autoCommitEmail}
          git add .
          git commit -m test
-         `, {cwd: testDir,encoding:'utf8'})
+         `, {
+            cwd: testDir,
+            encoding: 'utf8',
+            shell: process.platform === 'win32' ? 'powershell' : 'sh'
+        }) // powershell is needed for multiline scripts
         writeFileSync(join(testDir, 'config.yml'), 'data 2')
         expect(await isConfigModified(testDir)).toBeTruthy()
     })
