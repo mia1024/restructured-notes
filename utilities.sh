@@ -37,7 +37,7 @@
 #shopt -s compat31
 
 # Used variables MUST be initialized.
-set -o nounset
+#set -o nounset
 # Traces error in function & co.
 set -o errtrace
 

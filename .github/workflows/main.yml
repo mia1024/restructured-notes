@@ -117,8 +117,9 @@ jobs:
       - name: Install libjpeg
         shell: powershell
         run: |
-            wget 'https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.5/libjpeg-turbo-2.0.5-gcc64.exe?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Flibjpeg-turbo%2Ffiles%2F2.0.5%2Flibjpeg-turbo-2.0.5-gcc64.exe%2Fdownload&ts=1593231031' -OutFile jpeg.exe
-            .\jpeg.exe /S /D=C:\libjpeg-turbo
+            wget 'https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.5/libjpeg-turbo-2.0.5-gcc64.exe'
+            ls
+            .\libjpeg-turbo-2.0.5-gcc64.exe /S /D=C:\libjpeg-turbo
 
       - name: Run setup_env script
         run: ./setup_env
