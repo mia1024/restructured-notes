@@ -76,9 +76,6 @@ jobs:
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
-      - name: Setup homebrew
-        run: bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-
       - name: Install Dependencies
         run: brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman
 
@@ -110,8 +107,21 @@ jobs:
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
-      - name: Install Dependencies
-        run: yarn
+      - name: Download GTK2
+        shell: powershell
+        run: |
+          wget http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip -OutFile gtk.zip
+          expand-archive gtk.zip
+          mv gtk C:\GTK
+
+      - name: Install libjpeg
+          shell: powershell
+          run: |
+            wget 'https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.5/libjpeg-turbo-2.0.5-gcc64.exe?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Flibjpeg-turbo%2Ffiles%2F2.0.5%2Flibjpeg-turbo-2.0.5-gcc64.exe%2Fdownload&ts=1593231031' -OutFile jpeg.exe
+            .\jpeg.exe /S /D=C:\libjpeg-turbo
+
+      - name: Run setup_env script
+        run: ./setup_env
 
       - name: Run test
         run: yarn test:noelectron:nonyan
