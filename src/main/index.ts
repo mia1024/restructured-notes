@@ -31,7 +31,7 @@ function createMainWindow() {
                 additionalArguments: [nativeTheme.shouldUseDarkColors.toString()]
             },
             show: false,
-            frame: !isMacOS,
+            frame: true,
             titleBarStyle: isMacOS ? "hiddenInset" : undefined,
             width: width * 0.8,
             height: height * 0.8
