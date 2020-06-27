@@ -2,7 +2,7 @@ import expect from 'expect'
 import {FileBasedConfig} from "src/common";
 import {tmpdir} from "os"
 import {join} from 'path'
-import {readFileSync, writeFileSync} from "fs";
+import {readFileSync, writeFileSync,unlinkSync} from "fs";
 
 
 describe("src/common/config.ts",()=>{
@@ -34,5 +34,8 @@ describe("src/common/config.ts",()=>{
         let config=new TestConfig()
         writeFileSync(filePath,`a: \n  - b\n c\n`)
         expect(()=>config.loadFromDisk(filePath)).toThrowError()
+    })
+    after(()=>{
+        unlinkSync(filePath)
     })
 })

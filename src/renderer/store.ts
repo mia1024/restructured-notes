@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import {CSS,UserConfig} from 'src/common'
+import {CSS, UserConfig} from 'src/common'
 
 
 Vue.use(Vuex)
@@ -13,6 +13,16 @@ export class GlobalState {
 export interface UpdateUIStyleOptions {
     target: "toolbar" | "global"
     style: CSS,
+}
+
+export interface UpdateColorSchemeOptions {
+    target: 'dark' | 'light'
+    colors: {
+        foregroundColor?: string
+        backgroundColor?: string
+        accentColor?: string
+        highlightColor?: string
+    }
 }
 
 const mutations = {
@@ -30,7 +40,7 @@ const mutations = {
                 target = state.config.UIStyle.globalStyle
                 break
             default:
-                target={}
+                target = {}
                 console.error("Invalid target in updateUIStyle")
                 return
         }
@@ -38,7 +48,20 @@ const mutations = {
         Object.assign(target, option.style)
     },
 
-    updateTitle(state: GlobalState, newTitle: string) {
+    updateColorScheme(state:GlobalState,option:UpdateColorSchemeOptions){
+        let target;
+        switch (option.target) {
+            case "dark":
+                target=state.config.UIStyle.darkTheme
+                break
+            case "light":
+                target=state.config.UIStyle.lightTheme
+                break
+        }
+        Object.assign(target,option.colors)
+    },
+
+    setTitle(state: GlobalState, newTitle: string) {
         state.title = newTitle;
         document.title = newTitle;
     }
