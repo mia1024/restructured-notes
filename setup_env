@@ -1,23 +1,27 @@
 #!/bin/bash
 
 cd "${0%/*}"
+BSC_VERBOSE=1
 source utilities.sh
 
-yarn
-
-if checkBin md5; then
+if command -v md5 > /dev/null; then
   md5Program=md5
-elif checkBin md5sum; then
+elif command -v md5sum > /dev/null; then
   md5Program=md5sum
+else
+  errorMessage "Cannot find md5 or md5sum"
+  exit 1
 fi
+
+yarn
 
 rebuild_nodegit() {
   yarn compile-dependencies
   if [ $? -ne 0 ]; then
-    echo "yarn compile-dependencies failed. Trying electron-rebuild instead..."
+    info "yarn compile-dependencies failed. Trying electron-rebuild instead..."
     $(npm bin)/electron-rebuild
     if [ $? -ne 0 ]; then
-      echo "Cannot compile nodegit"
+      errorMessage "Cannot compile nodegit"
       exit 1
     fi
   fi
@@ -31,9 +35,9 @@ else
     if [ "$($md5Program node_modules/nodegit/build/Release/nodegit.node)" \
       == "$(cat node_modules/nodegit/.rebuilt-for-electron)" ]; then
 
-      echo 'Skipping nodegit as it has already been built for electron.'
-      echo 'run setup_env -f to force rebuild'
-      echo
+      info 'Skipping nodegit as it has already been built for electron.'
+      info 'run setup_env -f to force rebuild'
+      info
     else
       rebuild_nodegit
     fi
@@ -47,7 +51,7 @@ fi
 rebuild_canvas() {
   npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
   if [ $? -ne 0 ]; then
-    echo 'cannot rebuild canvas'
+    errorMessage 'cannot rebuild canvas'
     exit 1
   fi
   echo "$($md5Program node_modules/canvas/build/Release/canvas.node)" >node_modules/canvas/.rebuilt-for-electron
@@ -60,16 +64,16 @@ else
   if [ "$1" != '-f' ]; then
     if [ "$($md5Program node_modules/canvas/build/Release/canvas.node)" \
       == "$(cat node_modules/canvas/.rebuilt-for-electron)" ]; then
-      echo 'Skipping canvas as it has already been built for electron.'
-      echo 'run setup_env -f to force rebuild'
-      echo
+      info 'Skipping canvas as it has already been built for electron.'
+      info 'run setup_env -f to force rebuild'
+      info
     else
       rebuild_canvas
     fi
   else
     rebuild_canvas
     if [ $? -ne 0 ]; then
-      echo 'cannot rebuild canvas'
+      errorMessage 'cannot rebuild canvas'
       exit 1
     fi
   fi

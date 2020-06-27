@@ -60,16 +60,16 @@ export class FileBasedConfig {
 
     constructor() {
         if (existsSync(configFilePath))
-            //if (process.env.NODE_ENV === 'production')
-            try {
-                this.loadFromDisk()
-            } catch (e) {
-                console.error('Error while parsing configuration file: ', e)
-                throw e
-                //console.log(JSON.stringify(e))
-            }
-        // else
-        //     console.log('bypassing config.yml in development')
+            if (process.env.NODE_ENV === 'production')
+                try {
+                    this.loadFromDisk()
+                } catch (e) {
+                    console.error('Error while parsing configuration file: ', e)
+                    throw e
+                    //console.log(JSON.stringify(e))
+                }
+            else
+                console.log('bypassing config.yml in development')
 
     }
 }
