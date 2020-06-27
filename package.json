@@ -9,7 +9,9 @@
     "dist": "yarn compile && electron-builder",
     "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
     "test": "ELECTRON_RUN_AS_NODE=1 electron ./node_modules/.bin/mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts",
+    "test:nonyan": "ELECTRON_RUN_AS_NODE=1 electron ./node_modules/.bin/mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js ./test/**/*.spec.ts",
     "test:noelectron": "mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js --reporter nyan ./test/**/*.spec.ts",
+    "test:noelectron:nonyan": "mochapack --webpack-config node_modules/electron-webpack/webpack.renderer.config.js --require ./test/setup.js ./test/**/*.spec.ts",
     "compile-dependencies": "electron-builder install-app-deps"
   },
   "dependencies": {
