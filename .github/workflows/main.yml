@@ -80,6 +80,7 @@ jobs:
         run: brew install pkg-config cairo pango libpng jpeg giflib librsvg pixman
 
       - name: Run setup_env script
+        if: steps.cache-node_modules.outputs.cache-hit != 'true'
         run: ./setup_env
       - name: Run test
         run: yarn test:nonyan
@@ -107,22 +108,25 @@ jobs:
             ${{ runner.os }}-yarn-
             ${{ runner.os }}
 
-      - name: Download GTK2
-        shell: powershell
-        run: |
-          wget http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip -OutFile gtk.zip
-          expand-archive gtk.zip
-          mv gtk C:\GTK
+#      - name: Download GTK2
+#        shell: powershell
+#        run: |
+#          wget http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip -OutFile gtk.zip
+#          expand-archive gtk.zip
+#          mv gtk C:\GTK
+#
+#      - name: Install libjpeg
+#        shell: powershell
+#        run: |
+#            wget 'https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.5/libjpeg-turbo-2.0.5-gcc64.exe/download' -OutFile jpeg.exe
+#            ls
+#            .\jpeg.exe /S /D=C:\libjpeg-turbo
+#
+#      - name: Run setup_env script
+#        run: ./setup_env
 
-      - name: Install libjpeg
-        shell: powershell
-        run: |
-            wget 'https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.5/libjpeg-turbo-2.0.5-gcc64.exe'
-            ls
-            .\libjpeg-turbo-2.0.5-gcc64.exe /S /D=C:\libjpeg-turbo
-
-      - name: Run setup_env script
-        run: ./setup_env
+      - name: Install Dependencies
+        run: yarn
 
       - name: Run test
         run: yarn test:noelectron:nonyan
