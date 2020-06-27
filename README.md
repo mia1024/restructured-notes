@@ -195,12 +195,16 @@ yarn dev
 ```
 
 On Linux, the following packages need to be installed for all native modules to compile correctly:
+
 ```
 build-essential clang libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
 libkrb5-dev libdbus-1-dev libgtk-3-dev libnotify-dev libgnome-keyring-dev libasound2-dev \
 libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib curl \
 gperf bison python-dbusmock openjdk-8-jre
 ```
+
+It is important that you run the `setup_env` script instead of `yarn` or `npm install`, as a few dependencies 
+need to be compiled on your machine for everything to work. It is safe to run `setup_env` more than once. 
 
 # Run test
 

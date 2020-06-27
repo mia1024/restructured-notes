@@ -1,7 +1,15 @@
 #!/bin/bash
 
 cd "${0%/*}"
+source utilities.sh
+
 yarn
+
+if checkBin md5; then
+  md5Program=md5
+elif checkBin md5sum; then
+  md5Program=md5sum
+fi
 
 rebuild_nodegit() {
   yarn compile-dependencies
@@ -13,16 +21,22 @@ rebuild_nodegit() {
       exit 1
     fi
   fi
+  echo "$($md5Program node_modules/nodegit/build/Release/nodegit.node)" >node_modules/nodegit/.rebuilt-for-electron
 }
 
 if [ ! -f "node_modules/nodegit/.rebuilt-for-electron" ]; then
   rebuild_nodegit
-  touch "node_modules/nodegit/.rebuilt-for-electron"
 else
   if [ "$1" != '-f' ]; then
-    echo 'Skipping nodegit as it has already been built for electron.'
-    echo 'run setup_env -f to force rebuild'
-    echo
+    if [ "$($md5Program node_modules/nodegit/build/Release/nodegit.node)" \
+      == "$(cat node_modules/nodegit/.rebuilt-for-electron)" ]; then
+
+      echo 'Skipping nodegit as it has already been built for electron.'
+      echo 'run setup_env -f to force rebuild'
+      echo
+    else
+      rebuild_nodegit
+    fi
   else
     rebuild_nodegit
   fi
@@ -30,19 +44,30 @@ fi
 
 # Canvas is required by jsdom for testing
 
-if [ ! -f "node_modules/canvas/.rebuilt-for-electron" ]; then
+rebuild_canvas() {
   npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
   if [ $? -ne 0 ]; then
     echo 'cannot rebuild canvas'
     exit 1
   fi
-  touch "node_modules/canvas/.rebuilt-for-electron"
+  echo "$($md5Program node_modules/canvas/build/Release/canvas.node)" >node_modules/canvas/.rebuilt-for-electron
+}
+
+if [ ! -f "node_modules/canvas/.rebuilt-for-electron" ]; then
+  rebuild_canvas
+
 else
   if [ "$1" != '-f' ]; then
-    echo 'Skipping canvas as it has already been built for electron.'
-    echo 'run setup_env -f to force rebuild'
+    if [ "$($md5Program node_modules/canvas/build/Release/canvas.node)" \
+      == "$(cat node_modules/canvas/.rebuilt-for-electron)" ]; then
+      echo 'Skipping canvas as it has already been built for electron.'
+      echo 'run setup_env -f to force rebuild'
+      echo
+    else
+      rebuild_canvas
+    fi
   else
-    npm rebuild canvas --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
+    rebuild_canvas
     if [ $? -ne 0 ]; then
       echo 'cannot rebuild canvas'
       exit 1
