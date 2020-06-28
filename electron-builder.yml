@@ -3,5 +3,5 @@ productName: "Restructured Notes"
 appId: "com.restructurednotes.restructurednotes"
 directories:
   buildResources: "src/assets"
-
+npmRebuild: false
 

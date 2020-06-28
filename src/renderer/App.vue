@@ -1,11 +1,9 @@
 <template>
     <v-app app :style="globalStyle" >
-        <toolbar/>
-
         <v-main>
+            <toolbar/>
         </v-main>
     </v-app>
-
 </template>
 
 

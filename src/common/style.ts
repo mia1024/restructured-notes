@@ -1,4 +1,4 @@
-import {StandardProperties, StandardPropertiesHyphen, VendorProperties, VendorPropertiesHyphen} from "csstype";
+import {StandardProperties, StandardPropertiesHyphen, VendorProperties, VendorPropertiesHyphen} from "csstype"
 
 export interface CSS extends
     StandardPropertiesHyphen,

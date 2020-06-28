@@ -3,7 +3,7 @@ import Git from "nodegit"
 import {tmpdir} from "os"
 import {join} from 'path'
 import {mkdirSync, rmdirSync, writeFileSync,} from "fs";
-import {initRepoAndCommitAll, autoCommitEmail, autoCommitName, isConfigModified} from "../src/common";
+import {initRepoAndCommitAll, autoCommitEmail, autoCommitName, isConfigModified} from "src/common";
 import {execSync} from "child_process";
 
 describe("src/common/git.ts", () => {
@@ -14,7 +14,7 @@ describe("src/common/git.ts", () => {
         mkdirSync(testDir, {recursive: true})
     })
     afterEach(() => {
-        rmdirSync(testDir, {recursive: true})
+        rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
     })
 
     it("creates initial commit correctly", async () => {
