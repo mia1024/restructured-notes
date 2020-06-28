@@ -18,7 +18,7 @@ yarn
 rebuild_nodegit() {
   yarn compile-dependencies
   if [ $? -ne 0 ]; then
-    info "yarn compile-dependencies failed. Trying electron-rebuild instead..."
+    warn "yarn compile-dependencies failed. Trying electron-rebuild instead..."
     $(npm bin)/electron-rebuild
     if [ $? -ne 0 ]; then
       errorMessage "Cannot compile nodegit"

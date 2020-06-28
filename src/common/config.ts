@@ -1,32 +1,32 @@
-import {CSS} from "src/common";
-import {existsSync, readFileSync, writeFileSync} from 'fs'
-import {join as joinPath} from 'path'
-
-import YAML from 'yaml'
+import {CSS,uuid} from "src/common"
+import {existsSync, readFileSync, writeFileSync} from "fs"
+import {join as joinPath, resolve} from "path"
+import YAML from "yaml"
 import merge from "deepmerge"
+import {homedir} from "os"
 
 
-let configDirPath: string;
+let configDirPath: string
 
 switch (process.type) {
-    case 'renderer': {
-        let electron = require("electron")
-        configDirPath = electron.remote.app.getPath('userData')
+    case "renderer": {
+        const electron = require("electron")
+        configDirPath = electron.remote.app.getPath("userData")
         break
     }
-    case 'browser': {
-        let electron = require("electron")
-        configDirPath = electron.app.getPath('userData')
+    case "browser": {
+        const electron = require("electron")
+        configDirPath = electron.app.getPath("userData")
         break
     }
     default: {
-        let os = require('os')
+        const os = require("os")
         configDirPath = os.tmpdir()
     }
 }
-configDirPath = joinPath(configDirPath, 'User Data')
+configDirPath = joinPath(configDirPath, "User Data")
 
-const configFilePath = joinPath(configDirPath, 'config.yml')
+const configFilePath = joinPath(configDirPath, "config.yml")
 export {configDirPath, configFilePath}
 
 
@@ -35,42 +35,50 @@ class ColorScheme {
     backgroundColor: string
     accentColor: string
     highlightColor: string
+    shadowColor: string
 
-    constructor(config: { foreground: string, bg: string, accent: string, highlight: string }) {
+    constructor(config: { foreground: string, bg: string, accent: string, highlight: string, shadow: string }) {
         this.foregroundColor = config.foreground
         this.backgroundColor = config.bg
         this.accentColor = config.accent
         this.highlightColor = config.highlight
+        this.shadowColor = config.shadow
     }
 }
 
 
 export class FileBasedConfig {
+    _configPath?: string;
+
+    // this variable cannot be declared private because of subclasses and Object.assign
+
     save(path?: string): void {
-        if (path === undefined) path = configFilePath
-        let serialized = YAML.stringify(this, {indent: 4, simpleKeys: true})
-        writeFileSync(path, serialized)
+        let pathToWrite = path ?? this._configPath
+        if (pathToWrite === undefined) {
+            throw Error("A path to write must be specified either in object constructor or as an argument")
+        }
+        const serialized = YAML.stringify(this, {indent: 4, simpleKeys: true})
+        writeFileSync(pathToWrite, serialized)
     }
 
     loadFromDisk(path?: string): void {
-        if (path === undefined) path = configFilePath
-        let config = YAML.parse(readFileSync(path, {encoding: 'utf8'}))
+        let pathToRead = path ?? this._configPath
+        if (pathToRead === undefined) {
+            throw Error("A path to read must be specified either in object constructor or as an argument")
+        }
+
+        const config = YAML.parse(readFileSync(pathToRead, {encoding: "utf8"}))
         Object.assign(this, merge(this, config))
+        this._configPath ??= path
     }
 
-    constructor() {
-        if (existsSync(configFilePath))
-            if (process.env.NODE_ENV === 'production')
-                try {
-                    this.loadFromDisk()
-                } catch (e) {
-                    console.error('Error while parsing configuration file: ', e)
-                    throw e
-                    //console.log(JSON.stringify(e))
-                }
-            else
-                console.log('bypassing config.yml in development')
-
+    constructor(path?: string) {
+        this._configPath = path;
+        Object.defineProperty(this, '_configPath', {
+            writable: true,
+            enumerable: false
+            // prevent it from showing up in serialized configs
+        })
     }
 }
 
@@ -81,63 +89,104 @@ export class UserConfig extends FileBasedConfig {
     public UIStyle = new UIStyle
     public git = new Git
     public gpg = new GPG
-    public useDarkMode: boolean;
+    public useDarkMode!: boolean;
+    public notebookBaseDir: string = resolve(homedir(), "Restructured Notes");
+    public showWelcomeScreen: boolean = true
 
+    private static _instance?: UserConfig;
+
+    public reload() {
+        this.loadFromDisk()
+    }
+
+
+    // @ts-ignore: TS2376
+    // this is needed for UserConfig to be a singleton
     constructor() {
-        super()
+
+        if (UserConfig._instance !== undefined) {
+            return UserConfig._instance
+        }
+
+        super(configFilePath)
+
+        if (existsSync(configFilePath))
+            if (process.env.NODE_ENV === "production")
+                try {
+                    this.loadFromDisk()
+                } catch (e) {
+                    console.error("Error while parsing configuration file: ", e)
+                    throw e
+                    //console.log(JSON.stringify(e))
+                }
+            else
+                console.log("bypassing config.yml in development")
+
         switch (process.type) {
-            case 'renderer':
-                this.useDarkMode = window.process.argv[-1] === 'true'
+            case "renderer":
+                this.useDarkMode = false
+                // this value should already be set in config.yml,
+                // so here we are only adding a placeholder
                 break
-            case 'browser':
-                let electron = require('electron')
+            case "browser":
+                const electron = require("electron")
                 this.useDarkMode = electron.nativeTheme.shouldUseDarkColors
                 break
             default:
                 this.useDarkMode = true
         }
+        UserConfig._instance = this
     }
 }
 
 class Git {
-    public name: string = ""
-    public email: string = ""
-    public gpgsign: boolean = false
-    public useGPG: boolean = false
+    public name = ""
+    public email = ""
+    public gpgsign = false
+    public useGPGAgent = false
+    // if gpgsign is true but useGPGAgent is false,
+    // then the js implementation of gpg will be used,
+    // otherwise, a shell escape to the installed gpg agent
+    // will be used
 }
 
 class GPG {
-    signKey: string = ""
-    encryptKey: string = ""
-    executable: string = "gpg"
+    signKey = ""
+    encryptKey = ""
+    executable = "gpg"
 }
+
 
 class UIStyle {
     public globalStyle: CSS = {
-        'font-family': '"Roboto Mono", "Courier New", Courier, monospaced',
-        'font-size': '16px',
-        'font-weight': 300,
+        "font-family": "\"Roboto Mono\", \"Courier New\", Courier, monospaced",
+        "font-size": "16px",
+        "font-weight": 300,
     }
 
     public toolbarStyle: CSS = {
-        'font-family': 'inherit',
-        'font-size': 'inherit',
-        'color': 'inherit',
-        'background-color': 'inherit'
+        "font-family": "inherit",
+        "font-size": "inherit",
+        "color": "inherit",
+        "background-color": "inherit"
     };
     public darkTheme = new ColorScheme(
         {
-            foreground: '#ffffff',
-            bg: '#121212',
-            accent: '#bb86fc',
-            highlight: '#03dac6'
+            foreground: "#ffffff",
+            bg: "#121212",
+            accent: "#bb86fc",
+            highlight: "#03dac6",
+            shadow: "rgba(0,0,0,0.5)"
         })
     public lightTheme = new ColorScheme(
         {
-            foreground: '#000000',
-            bg: '#ffffff',
-            accent: '#8bc34a',
-            highlight: '#03a9f4'
+            foreground: "#000000",
+            bg: "#ffffff",
+            accent: "#8bc34a",
+            highlight: "#03a9f4",
+            shadow: "rgba(0,0,0,0.5)"
         }
     )
 }
+
+// ----------------------------------------------------------

@@ -58,11 +58,13 @@ describe('src/render/store.ts', () => {
         expect(store.state.config.UIStyle.lightTheme.backgroundColor).not.toBe(color)
         expect(store.state.config.UIStyle.lightTheme.accentColor).not.toBe(color)
         expect(store.state.config.UIStyle.lightTheme.highlightColor).not.toBe(color)
+        expect(store.state.config.UIStyle.lightTheme.shadowColor).not.toBe(color)
 
         expect(store.state.config.UIStyle.darkTheme.foregroundColor).not.toBe(color)
         expect(store.state.config.UIStyle.darkTheme.backgroundColor).not.toBe(color)
         expect(store.state.config.UIStyle.darkTheme.accentColor).not.toBe(color)
         expect(store.state.config.UIStyle.darkTheme.highlightColor).not.toBe(color)
+        expect(store.state.config.UIStyle.darkTheme.shadowColor).not.toBe(color)
 
         store.commit('updateColorScheme',{
             target:'dark',
@@ -70,7 +72,8 @@ describe('src/render/store.ts', () => {
                 foregroundColor:color,
                 backgroundColor:color,
                 accentColor:color,
-                highlightColor:color
+                highlightColor:color,
+                shadowColor:color
             }
         } as UpdateColorSchemeOptions)
 
@@ -78,6 +81,7 @@ describe('src/render/store.ts', () => {
         expect(store.state.config.UIStyle.darkTheme.backgroundColor).toBe(color)
         expect(store.state.config.UIStyle.darkTheme.accentColor).toBe(color)
         expect(store.state.config.UIStyle.darkTheme.highlightColor).toBe(color)
+        expect(store.state.config.UIStyle.darkTheme.shadowColor).toBe(color)
 
         store.commit('updateColorScheme',{
             target:'light',
@@ -85,7 +89,8 @@ describe('src/render/store.ts', () => {
                 foregroundColor:color,
                 backgroundColor:color,
                 accentColor:color,
-                highlightColor:color
+                highlightColor:color,
+                shadowColor:color
             }
         } as UpdateColorSchemeOptions)
 
@@ -93,7 +98,6 @@ describe('src/render/store.ts', () => {
         expect(store.state.config.UIStyle.lightTheme.backgroundColor).toBe(color)
         expect(store.state.config.UIStyle.lightTheme.accentColor).toBe(color)
         expect(store.state.config.UIStyle.lightTheme.highlightColor).toBe(color)
+        expect(store.state.config.UIStyle.lightTheme.shadowColor).toBe(color)
     })
-
-
 })
