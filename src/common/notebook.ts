@@ -9,7 +9,7 @@ export class NotebookConfig extends FileBasedConfig {
     // this is used for display purpose
     // because the directory name will be
     // normalized per POSIX standard
-    uuid!: string;
+    public readonly uuid!: string;
 
     constructor(path: string, create: boolean = false, name?: string) {
         super(joinPath(path, 'config.yml'));
@@ -82,6 +82,12 @@ class Notebook {
             }
             let notebookPath = resolvePath(path, convertFilename(name))
             mkdirSync(notebookPath, {recursive: true})
+            if (readdirSync(notebookPath).length!==0){
+                this._initError=Error(notebookPath+' already exists')
+                this._initCompleted=true
+                return;
+            }
+
             try {
                 this.config = new NotebookConfig(notebookPath, create, name)
                 this.config.save()
