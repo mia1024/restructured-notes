@@ -54,7 +54,7 @@ describe('notebook.spec.ts', () => {
     it('loads notebook correctly', async () => {
         const notebookName = 'Test Notebook'
         await createNotebook(notebookName, testDir)
-        let notebook = await openNotebook(testDir,notebookName)
+        let notebook = await openNotebook(testDir, notebookName)
         expect(notebook.repo).not.toBeUndefined()
         expect(notebook.initError).toBeUndefined()
         expect(notebook.initCompleted).toBeTruthy()
@@ -90,4 +90,8 @@ describe('notebook.spec.ts', () => {
             .toBe('/home/users/restructured notes/restructured-notes')
     })
 
+    it('throws an error while trying to create two notebooks with the same name at the same place', async () => {
+        let notebook = await createNotebook('test notebook', testDir)
+        expect(createNotebook('test notebook', testDir)).rejects.toThrowError(/already exists/gi)
+    })
 })

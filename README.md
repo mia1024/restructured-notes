@@ -204,7 +204,8 @@ gperf bison python-dbusmock openjdk-8-jre libssl-dev libsqlite3-dev
 ```
 
 It is important that you run the `setup_env` script instead of `yarn` or `npm install`, as a few dependencies 
-need to be compiled on your machine for everything to work. It is safe to run `setup_env` more than once. 
+need to be compiled on your machine for everything to work. It is safe to run `setup_env` more than once. Also,
+you will need bash 4+ for the `setup_env` script to work
 
 # Run test
 
