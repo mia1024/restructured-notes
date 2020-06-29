@@ -1,8 +1,8 @@
 import {UserConfig, FileBasedConfig} from "src/common"
-import {existsSync, lstatSync, mkdirSync, readdirSync} from "fs";
+import {existsSync, lstatSync, mkdirSync, readdirSync, realpathSync} from "fs";
 import {initRepoAndCommitAll, openRepo} from "src/common";
 import {Repository} from "nodegit";
-import {join as joinPath, resolve} from "path"
+import {join as joinPath, resolve as resolvePath, parse as parsePath} from "path"
 import {uuid} from "src/common";
 
 const config = new UserConfig()
@@ -13,7 +13,7 @@ export class NotebookConfig extends FileBasedConfig {
     // this is used for display purpose
     // because the directory name will be
     // normalized per POSIX standard
-    uuid!:string;
+    uuid!: string;
 
     constructor(path: string, create: boolean = false, name?: string) {
         super(joinPath(path, 'config.yml'));
@@ -24,17 +24,21 @@ export class NotebookConfig extends FileBasedConfig {
                 this.name = name
                 this.uuid = uuid()
             }
-        else{
+        else {
             this.loadFromDisk()
-            if (this.uuid===undefined)
+            if (this.uuid === undefined)
                 throw Error("Invalid Notebook configuration: uuid must be defined")
-            if (this.name===undefined)
+            if (this.name === undefined)
                 throw Error("Invalid Notebook configuration: name must be defined")
         }
 
     }
 }
 
+/**
+ The Notebook class. Do not use the constructor.
+ Use createNotebook() instead
+ */
 class Notebook {
 
     // a notebook is, in essence, a git repo
@@ -67,6 +71,8 @@ class Notebook {
             if (existsSync(path)) {
                 let stat = lstatSync(path)
                 if (stat.isSymbolicLink()) {
+                    // this shouldn't happen because createNotebook()
+                    // pass in a real path. but we should check it anyway
                     this._initError = Error("The path specified is a symlink")
                     this._initCompleted = true
                     return
@@ -77,32 +83,34 @@ class Notebook {
                     this._initCompleted = true
                     return
                 }
-                if (readdirSync(path).length !== 0) {
-                    this._initError = Error("The directory is not empty")
-                    this._initCompleted = true
-                    return
-                }
             }
-
-            mkdirSync(path, {recursive: true})
+            let notebookPath = resolvePath(path, convertFilename(name))
+            mkdirSync(notebookPath, {recursive: true})
             try {
-                this.config = new NotebookConfig(path, create, name)
+                this.config = new NotebookConfig(notebookPath, create, name)
                 this.config.save()
             } catch (e) {
                 this._initError = e
                 this._initCompleted = true
                 return;
             }
-            this.path = path
+            this.path = notebookPath
             this.notes = []
-            initRepoAndCommitAll(path).then((repo) => {
+            initRepoAndCommitAll(notebookPath).then((repo) => {
                 this.repo = repo
             }).catch(e => {
                 this._initError = e
             }).finally(() => {
                 this._initCompleted = true
             })
-        } else {
+        } else { // loading notebook
+            if (!existsSync(joinPath(path, 'config.yml')))
+                if (name) { // try a few other possible paths
+                    path = joinPath(path, name)
+                    if (!existsSync(joinPath(path, 'config.yml')))
+                        path = normalizeNotebookPath(path)
+                }
+
             try {
                 this.config = new NotebookConfig(path)
             } catch (e) {
@@ -110,7 +118,7 @@ class Notebook {
                 this._initCompleted = true
                 return;
             }
-            this.path = path
+            this.path = realpathSync(path)
             this.notes = []
             let files = readdirSync(path)
             for (let f of files)
@@ -128,11 +136,15 @@ class Notebook {
 
 }
 
+
 class Note {
-    // relative to the notebook folder
+
     public path: string;
 
-
+    /**
+     *
+     * @param path: the path relative to the notebook root
+     */
     constructor(path: string) {
         this.path = path
     }
@@ -144,9 +156,41 @@ function sleep(ms: number) {
 
 export type {Notebook}
 
-export async function createNotebook(name: string, path?: string): Promise<Notebook> {
-    // TODO: sanitize name
-    path ??= resolve(config.notebookBaseDir, name)
+/** converts a filename into a github compatible name
+ *
+ * @param fn the filename
+ * @return a proper path for the specific platform
+ */
+function convertFilename(fn: string): string {
+    let o = fn
+        .replace(/\s/g, '-')
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '')
+        .replace(/[\/?<>\\:*|"]/g, '-')
+        .replace(/^\.$/, 'dot')
+        .replace(/^\.$/, 'dot-dot')
+    if (process.platform == 'win32') {
+        o = o.replace(/[. ]+$/, '')
+            .replace(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i, '-$1$2')
+    }
+    return o
+}
+
+export function normalizeNotebookPath(p: string): string {
+    let parsed = parsePath(p)
+    return joinPath(parsed.dir, convertFilename(parsed.base))
+}
+
+/** Create a notebook into the directory. A new directory will always be created inside
+ * the specified path or the default folder.
+ *
+ * @param name The name of the notebook to create
+ * @param path Optional. If omitted, the notebookBaseDir in user config will be used
+ */
+
+export async function createNotebook(name: string, path?: string) {
+    path ??= resolvePath(config.notebookBaseDir, name)
+    path = realpathSync(path)
+
     let notebook = new Notebook(path, true, name)
     while (true) {
         if (notebook.initCompleted) {
@@ -159,8 +203,14 @@ export async function createNotebook(name: string, path?: string): Promise<Noteb
     }
 }
 
-export async function openNotebook(path: string): Promise<Notebook> {
-    let notebook = new Notebook(path)
+export async function openNotebook(path: string, name?: string): Promise<Notebook> {
+    let notebook = new Notebook(path, false, name)
+    // this is intentionally not normalized
+    // as a user may drop a notebook folder
+    // into the app without a normalized name
+    // which would have been problematic if
+    // the path were normalized
+
     while (true) {
         if (notebook.initCompleted) {
             if (notebook.initError)
