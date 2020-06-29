@@ -1,33 +1,9 @@
-import {CSS,uuid} from "src/common"
+import {CSS,uuid,configFilePath, configDirPath} from "src/common"
 import {existsSync, readFileSync, writeFileSync} from "fs"
 import {join as joinPath, resolve} from "path"
 import YAML from "yaml"
 import merge from "deepmerge"
-import {homedir} from "os"
-
-
-let configDirPath: string
-
-switch (process.type) {
-    case "renderer": {
-        const electron = require("electron")
-        configDirPath = electron.remote.app.getPath("userData")
-        break
-    }
-    case "browser": {
-        const electron = require("electron")
-        configDirPath = electron.app.getPath("userData")
-        break
-    }
-    default: {
-        const os = require("os")
-        configDirPath = os.tmpdir()
-    }
-}
-configDirPath = joinPath(configDirPath, "User Data")
-
-const configFilePath = joinPath(configDirPath, "config.yml")
-export {configDirPath, configFilePath}
+import {homedir,tmpdir} from "os"
 
 
 class ColorScheme {
@@ -93,7 +69,7 @@ export class UserConfig extends FileBasedConfig {
     public notebookBaseDir: string = resolve(homedir(), "Restructured Notes");
     public showWelcomeScreen: boolean = true
 
-    private static _instance?: UserConfig;
+    private static instance?: UserConfig;
 
     public reload() {
         this.loadFromDisk()
@@ -104,8 +80,8 @@ export class UserConfig extends FileBasedConfig {
     // this is needed for UserConfig to be a singleton
     constructor() {
 
-        if (UserConfig._instance !== undefined) {
-            return UserConfig._instance
+        if (UserConfig.instance !== undefined) {
+            return UserConfig.instance
         }
 
         super(configFilePath)
@@ -135,7 +111,7 @@ export class UserConfig extends FileBasedConfig {
             default:
                 this.useDarkMode = true
         }
-        UserConfig._instance = this
+        UserConfig.instance = this
     }
 }
 

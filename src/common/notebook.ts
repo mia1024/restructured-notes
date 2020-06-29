@@ -1,11 +1,7 @@
-import {UserConfig, FileBasedConfig} from "src/common"
+import {FileBasedConfig, initRepoAndCommitAll, openRepo, UserConfig, uuid, sleep} from "src/common"
 import {existsSync, lstatSync, mkdirSync, readdirSync, realpathSync} from "fs";
-import {initRepoAndCommitAll, openRepo} from "src/common";
 import {Repository} from "nodegit";
-import {join as joinPath, resolve as resolvePath, parse as parsePath} from "path"
-import {uuid} from "src/common";
-
-const config = new UserConfig()
+import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
 
 
 export class NotebookConfig extends FileBasedConfig {
@@ -48,8 +44,8 @@ class Notebook {
     public path!: string;
     public notes!: Note[]
     public repo!: Repository
-    protected _initError?: Error
-    protected _initCompleted: boolean = false
+    private _initError?: Error
+    private _initCompleted: boolean = false
 
     get initError() {
         return this._initError
@@ -150,9 +146,6 @@ class Note {
     }
 }
 
-function sleep(ms: number) {
-    return new Promise((r => setTimeout(r, ms)))
-}
 
 export type {Notebook}
 
@@ -188,6 +181,7 @@ export function normalizeNotebookPath(p: string): string {
  */
 
 export async function createNotebook(name: string, path?: string) {
+    const config = new UserConfig()
     path ??= resolvePath(config.notebookBaseDir, name)
     path = realpathSync(path)
 
@@ -204,6 +198,7 @@ export async function createNotebook(name: string, path?: string) {
 }
 
 export async function openNotebook(path: string, name?: string): Promise<Notebook> {
+
     let notebook = new Notebook(path, false, name)
     // this is intentionally not normalized
     // as a user may drop a notebook folder
