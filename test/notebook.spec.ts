@@ -1,7 +1,7 @@
 import {join} from "path";
 import {tmpdir} from "os";
-import {mkdirSync, rmdirSync, symlinkSync, writeFileSync} from "fs";
-import {createNotebook, Notebook, NotebookConfig, openNotebook} from "src/common";
+import {mkdirSync, realpathSync, rmdirSync, symlinkSync, writeFileSync} from "fs";
+import {createNotebook, normalizeNotebookPath, NotebookConfig, openNotebook} from "src/common";
 import expect from 'expect'
 
 
@@ -10,12 +10,13 @@ describe('notebook.spec.ts', () => {
 
     beforeEach(() => {
         testDir = join(tmpdir(), 'test-rstnotes', 'test' + Math.random())
+        console.log(testDir)
         mkdirSync(testDir, {recursive: true})
     })
 
-    after(() => {
-        rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
-    })
+    // after(() => {
+    //     rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
+    // })
 
 
     it("throws an error when creating a NotebookConfig without a name", () => {
@@ -51,9 +52,9 @@ describe('notebook.spec.ts', () => {
     })
 
     it('loads notebook correctly', async () => {
-        const notebookName = 'testNotebook'
+        const notebookName = 'Test Notebook'
         await createNotebook(notebookName, testDir)
-        let notebook = await openNotebook(testDir)
+        let notebook = await openNotebook(testDir,notebookName)
         expect(notebook.repo).not.toBeUndefined()
         expect(notebook.initError).toBeUndefined()
         expect(notebook.initCompleted).toBeTruthy()
@@ -70,10 +71,6 @@ describe('notebook.spec.ts', () => {
         await expect(openNotebook(testDir)).rejects.toThrow(/repository/gi)
     })
 
-    it('throws an error loading notebook into a non-empty folder', async () => {
-        writeFileSync(join(testDir, 'testFile'), '')
-        await expect(createNotebook('testNotebook', testDir)).rejects.toThrow(/not empty/gi)
-    })
 
     it('throws an error loading notebook into a file', async () => {
         const testFile = join(testDir, 'testFile')
@@ -81,10 +78,16 @@ describe('notebook.spec.ts', () => {
         await expect(createNotebook('testNotebook', testFile)).rejects.toThrow(/not a directory/gi)
     })
 
-    it('throws an error loading notebook into a symlink', async () => {
+    it('creates the notebook into the real path of a symlink directory', async () => {
         mkdirSync(join(testDir, 'test'))
         symlinkSync('./test', join(testDir, 'test2'))
-        await expect(createNotebook('testNotebook', join(testDir, 'test2'))).rejects.toThrow(/a symlink/gi)
-        expect((await createNotebook('testNotebook', join(testDir, 'test'))).initError).toBeUndefined()
+        expect((await createNotebook('testNotebook', join(testDir, 'test2'))).path)
+            .toBe(realpathSync(join(testDir, 'test', 'testNotebook')))
     })
+
+    it('normalizes notebook directory name correctly', () => {
+        expect(normalizeNotebookPath('/home/users/restructured notes/restructured notes'))
+            .toBe('/home/users/restructured notes/restructured-notes')
+    })
+
 })
