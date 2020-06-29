@@ -10,13 +10,13 @@ describe('notebook.spec.ts', () => {
 
     beforeEach(() => {
         testDir = join(tmpdir(), 'test-rstnotes', 'test' + Math.random())
-        console.log(testDir)
+        // console.log(testDir)
         mkdirSync(testDir, {recursive: true})
     })
 
-    // after(() => {
-    //     rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
-    // })
+    after(() => {
+        rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
+    })
 
 
     it("throws an error when creating a NotebookConfig without a name", () => {
