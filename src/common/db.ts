@@ -1,6 +1,7 @@
 import sql from 'sqlite3'
 import {configDirPath, Notebook, sleep} from 'src/common'
 import {join} from "path";
+import {mkdirSync} from "fs";
 
 /**
  *  Abstract interface for database connection. Do not use the constructor directly.
@@ -36,28 +37,48 @@ class Database {
         this.db.run(`CREATE TABLE IF NOT EXISTS notebooks (
              uuid char(128) PRIMARY KEY NOT NULL,
              path varchar(${process.platform === 'win32' ? 260 : 4096}) UNIQUE NOT NULL
-             )`, (err) => {
+             );`, (err) => {
+
             this._initError = err
             this._initCompleted = true
         })
     }
 
-    async getNotebookPath(uuid: string):Promise<null|string> {
+    async addOrUpdateNotebook(notebook: Notebook): Promise<void> {
+        let done: boolean = false
+        let error: null | Error = null
+        this.db.run(
+            'INSERT OR REPLACE INTO notebooks (uuid,path) VALUES (?, ?)',
+            [notebook.config.uuid, notebook.path],
+            (err) => {
+                done = true
+                error = err
+            }
+        )
+        while (!done)
+            await sleep(5)
+        if (error)
+            throw error
+    }
+
+    async getNotebookPath(uuid: string): Promise<null | string> {
         let error: Error | null = null;
-        let res:undefined|Object = undefined;
+        let res: undefined | Object = undefined;
         let completed = false
-        this.db.get('SELECT path FROM notebooks WHERE uuid=?', uuid, (err, row) => {
+        this.db.get('SELECT * FROM notebooks WHERE uuid=?', uuid, (err, row) => {
             error = err
             res = row
             completed = true
         })
+
+
         while (!completed)
             await sleep(5)
 
         if (error !== null)
             throw error
 
-        if (res!==undefined)
+        if (res !== undefined)
             return res['path']
         else
             return null
@@ -70,16 +91,19 @@ export async function getDB() {
     if (Database.instance !== undefined)
         return Database.instance
 
-    let creationDone = false
-    let creationError = null
+    let creationDone: boolean = false
+    let creationError: null | Error = null
+
+
     let sqldb = new (sql.verbose().Database)(join(configDirPath, 'db.sqlite3'), (err) => {
         if (err === null)
             creationDone = true
         else
             creationError = err
     })
-    while (!creationDone)
+    while (creationDone)
         await sleep(10)
+
 
     if (creationError !== null)
         throw creationError
@@ -87,6 +111,7 @@ export async function getDB() {
     let db = new Database(sqldb)
     while (!db.initCompleted)
         await sleep(10)
+
 
     if (db.initError != undefined)
         throw db.initError

@@ -11,15 +11,15 @@ describe("src/common/config.ts", () => {
         // this ensures that configDirPath is set to a temp directory
         // so we don't accidentally delete the real config file
 
-        if (existsSync(configDirPath))
-            unlinkSync(configDirPath)
-        mkdirSync(configDirPath, {recursive: true})
+        // if (existsSync(configDirPath))
+        //     rmdirSync(configDirPath,{recursive:true})
+        // mkdirSync(configDirPath, {recursive: true})
     })
 
 
     after(() => {
         unlinkSync(filePath)
-        rmdirSync(configDirPath)
+        // rmdirSync(configDirPath,{recursive:true})
     })
 
     class TestConfig extends FileBasedConfig {
