@@ -33,8 +33,9 @@ There should be at least one commit per checkbox. After completion of each check
 	- Logic
 		- [ ] OOP model for notebook fs representation
 		- [ ] Git/VCS integration
-		- [ ] database for tags (MongoDB)
-		- [ ] multi-instance editor lock
+		- [ ] database for tags 
+		- [ ] ~~multi-instance editor lock~~
+		- [ ] Hooks
 	- UI
 		- VCS
 			- [ ] notebook/note creation dialog
@@ -48,8 +49,8 @@ There should be at least one commit per checkbox. After completion of each check
 			- [ ] plain text editor for notes
 			- [ ] Directory/notebook tree viewer
 		- [x] Launcher icon (e37cd84)
-		- [ ] Dialog for detection warning
-		- [ ] i18n
+		- [ ] ~~Dialog for detection warning~~
+		- [ ] ~~i18n~~
 	- Docs
 		- [ ] fs model for a notebook
 		- [ ] tag DB architectures
@@ -58,7 +59,7 @@ There should be at least one commit per checkbox. After completion of each check
 		- [ ] fs operations
 		- [ ] tags 
 		- [ ] UI navigation
-		- [ ] settings
+		- [x] settings
 		- [ ] URL scheme
 - v 0.0.2
 	- Logic 

@@ -5,6 +5,9 @@ import {tmpdir} from "os";
 import {existsSync, mkdirSync, renameSync, rmdirSync} from "fs";
 import {configDirPath, createNotebook, Notebook, openNotebook} from "../src/common";
 
+// @ts-ignore: TS2339. This variable is injected in setup.js
+let cleanup: boolean = global.performCleanup
+
 describe('src/common/db', () => {
     let testDir: string;
     before(() => {
@@ -12,8 +15,6 @@ describe('src/common/db', () => {
         // this ensures that configDirPath is set to a temp directory
         // so we don't accidentally delete the real config file
 
-        // if (existsSync(configDirPath))
-        //     rmdirSync(configDirPath,{recursive:true})
         mkdirSync(configDirPath, {recursive: true})
     })
 
@@ -25,8 +26,10 @@ describe('src/common/db', () => {
 
 
     after(() => {
-        rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
-        //rmdirSync(configDirPath,{recursive:true})
+        if (cleanup) {
+            rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
+            rmdirSync(configDirPath, {recursive: true})
+        }
     })
 
     it('opens a db without error', async () => {
