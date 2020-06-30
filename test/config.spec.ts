@@ -4,6 +4,8 @@ import {tmpdir} from "os"
 import {join} from 'path'
 import {readFileSync, writeFileSync, unlinkSync, existsSync, rmdirSync, mkdirSync} from "fs";
 
+// @ts-ignore: TS2339. This variable is injected in setup.js
+let cleanup: boolean = global.performCleanup
 
 describe("src/common/config.ts", () => {
     before(() => {
@@ -11,15 +13,15 @@ describe("src/common/config.ts", () => {
         // this ensures that configDirPath is set to a temp directory
         // so we don't accidentally delete the real config file
 
-        // if (existsSync(configDirPath))
-        //     rmdirSync(configDirPath,{recursive:true})
-        // mkdirSync(configDirPath, {recursive: true})
+        mkdirSync(configDirPath, {recursive: true})
     })
 
 
     after(() => {
-        unlinkSync(filePath)
-        // rmdirSync(configDirPath,{recursive:true})
+        if (cleanup) {
+            unlinkSync(filePath)
+            rmdirSync(configDirPath, {recursive: true})
+        }
     })
 
     class TestConfig extends FileBasedConfig {

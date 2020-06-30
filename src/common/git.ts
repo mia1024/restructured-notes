@@ -1,13 +1,13 @@
 import Git, {Repository} from "nodegit"
 
-export const autoCommitName="Restructured Notes"
-export const autoCommitEmail="app@restructurednotes.com"
+export const autoCommitName = "Restructured Notes"
+export const autoCommitEmail = "app@restructurednotes.com"
 
 function getSystemSignature() {
     return Git.Signature.now(autoCommitName, autoCommitEmail)
 }
 
-export async function initRepoAndCommitAll(path: string) {
+export async function initRepoAndCommitAll(path: string, message?: string) {
     try {
         const repo = await Git.Repository.init(path, 0)
         const index = await repo.index()
@@ -18,7 +18,7 @@ export async function initRepoAndCommitAll(path: string) {
             "HEAD",
             getSystemSignature(),
             getSystemSignature(),
-            "Initial commit",
+            message ?? "Initial commit",
             tree,
             [] // initial commit doesn't have a parent
         )
@@ -34,13 +34,29 @@ export async function initRepoAndCommitAll(path: string) {
     }
 }
 
-export async function openRepo(path:string) {
-    return await Repository.open(path)
+export async function openRepo(path: string) {
+    try {
+        return await Repository.open(path)
+    } catch (e) {
+        throw e
+    }
 }
 
-export async function commitConfigFileWithSystemSignature(repoPath: string) {
+export async function tagHEAD(repo: string | Repository, name: string) {
     try {
-        const repo = await Git.Repository.open(repoPath)
+        if (!(repo instanceof Repository))
+            repo = await openRepo(repo)
+        let commit = await repo.getHeadCommit()
+        return await repo.createLightweightTag(commit.id(), name)
+    } catch (e) {
+        throw e
+    }
+}
+
+export async function commitConfigFileWithSystemSignature(repo: string | Repository) {
+    try {
+        if (!(repo instanceof Repository))
+            repo = await openRepo(repo)
         return await repo.createCommitOnHead(
             ["config.yml"],
             getSystemSignature(),
@@ -52,18 +68,38 @@ export async function commitConfigFileWithSystemSignature(repoPath: string) {
     }
 }
 
-export async function isConfigModified(repoPath: string) {
+export async function commitConfigFileAndTag(repo: string | Repository) {
     try {
-        const repo = await Git.Repository.open(repoPath)
-        const status = await Git.Status.file(repo, "config.yml")
-        return status===Git.Status.STATUS.WT_MODIFIED
+        if (!(repo instanceof Repository))
+            repo = await openRepo(repo)
+        let commit = await repo.createCommitOnHead(
+            ["config.yml"],
+            getSystemSignature(),
+            getSystemSignature(),
+            "Updated config.yml"
+        )
+        try {
+            await repo.deleteTagByName('LastWorkingConfig')
+        } catch (e) {
+            if (!e.message.match(/reference .+ not found/gi))
+                throw e
+        }
+        await repo.createLightweightTag(commit, 'LastWorkingConfig')
     } catch (e) {
         throw e
     }
 }
 
-export async function tag(repo:any){
-
+export async function isConfigModified(repo: string | Repository) {
+    try {
+        if (!(repo instanceof Repository))
+            repo = await openRepo(repo)
+        const status = await Git.Status.file(repo, "config.yml")
+        return status === Git.Status.STATUS.WT_MODIFIED
+    } catch (e) {
+        throw e
+    }
 }
+
 
 export {Git}

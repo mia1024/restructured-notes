@@ -4,3 +4,5 @@ global.expect = require('expect')
 process.on('unhandledRejection', e => {
     throw e
 })
+
+global.performCleanup=true

@@ -1,4 +1,13 @@
-import {FileBasedConfig, initRepoAndCommitAll, openRepo, UserConfig, uuid, sleep} from "src/common"
+import {
+    FileBasedConfig,
+    initRepoAndCommitAll,
+    openRepo,
+    UserConfig,
+    uuid,
+    sleep,
+    isConfigModified,
+    commitConfigFileAndTag
+} from "src/common"
 import {existsSync, lstatSync, mkdirSync, readdirSync, realpathSync} from "fs";
 import {Repository} from "nodegit";
 import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
@@ -55,6 +64,13 @@ class Notebook {
         return this._initCompleted
     }
 
+    async save() {
+        this.config.save()
+        if (await isConfigModified(this.path)) {
+            await commitConfigFileAndTag(this.path)
+        }
+    }
+
 
     constructor(path: string, create: boolean = false, name?: string) {
         if (create) {
@@ -81,10 +97,17 @@ class Notebook {
                 }
             }
             let notebookPath = resolvePath(path, convertFilename(name))
+            if (existsSync(notebookPath))
+                if (!lstatSync(notebookPath).isDirectory()) {
+                    this._initError = Error('File ' + notebookPath + ' already exists')
+                    this._initCompleted = true
+                    return;
+                }
+
             mkdirSync(notebookPath, {recursive: true})
-            if (readdirSync(notebookPath).length!==0){
-                this._initError=Error(notebookPath+' already exists')
-                this._initCompleted=true
+            if (readdirSync(notebookPath).length !== 0) {
+                this._initError = Error('Directory ' + notebookPath + ' already exists')
+                this._initCompleted = true
                 return;
             }
 
@@ -98,7 +121,7 @@ class Notebook {
             }
             this.path = notebookPath
             this.notes = []
-            initRepoAndCommitAll(notebookPath).then((repo) => {
+            initRepoAndCommitAll(notebookPath, `Created notebook ${name}`).then((repo) => {
                 this.repo = repo
             }).catch(e => {
                 this._initError = e
@@ -179,7 +202,8 @@ export function normalizeNotebookPath(p: string): string {
     return joinPath(parsed.dir, convertFilename(parsed.base))
 }
 
-/** Create a notebook into the directory. A new directory will always be created inside
+/** Create a notebook into the directory and initialize its git repository.
+ * A new directory will always be created inside
  * the specified path or the default folder.
  *
  * @param name The name of the notebook to create
@@ -203,6 +227,11 @@ export async function createNotebook(name: string, path?: string) {
     }
 }
 
+/** Opens a notebook at a specific location
+ *
+ * @param path the path of the notebook, or the parent folder of the notebook if name is given
+ * @param name optional. the name of the notebook for additional lookup
+ */
 export async function openNotebook(path: string, name?: string): Promise<Notebook> {
 
     let notebook = new Notebook(path, false, name)
