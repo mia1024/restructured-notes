@@ -88,9 +88,12 @@ describe('notebook.spec.ts', () => {
             .toBe(realpathSync(join(testDir, 'test', 'testNotebook')))
     })
 
-    it('normalizes notebook directory name correctly', () => {
-        expect(normalizeNotebookPath('/home/users/restructured notes/restructured notes'))
-            .toBe('/home/users/restructured notes/restructured-notes')
+    it('normalizes notebook directory name correctly', function () {
+        if (process.platform=='win32')
+            this.skip()
+        expect(normalizeNotebookPath('/home/user/restructured notes/restructured notes'))
+            .toBe('/home/user/restructured notes/restructured-notes')
+
     })
 
     it('throws an error while trying to create two notebooks with the same name at the same place', async () => {

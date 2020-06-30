@@ -52,8 +52,8 @@ rebuild_sqlite3() {
   fi
   platform=$(uname)
   oldPath="node_modules/sqlite3/lib/binding/electron-v8.2-${platform,,}-x64/node_sqlite3.node"
-  newPath="node_modules/sqlite3/lib/binding/electron-v8.2-${platform,,}-x64/node_sqlite3.node"
-  mkdir -p "node_modules/sqlite3/lib/binding/electron-v8.2-${platform,,}-x64/"
+  newPath="node_modules/sqlite3/lib/binding/electron-v8.3-${platform,,}-x64/node_sqlite3.node"
+  mkdir -p "node_modules/sqlite3/lib/binding/electron-v8.3-${platform,,}-x64/"
   cp "$oldPath" "$newPath"
   echo "$($md5Program $newPath)" >node_modules/sqlite3/.rebuilt-for-electron
 }
@@ -64,7 +64,7 @@ if [ ! -f "node_modules/sqlite3/.rebuilt-for-electron" ]; then
 else
   if [ "$1" != '-f' ]; then
     platform=$(uname)
-    libPath="node_modules/sqlite3/lib/binding/electron-v8.2-${platform,,}-x64/node_sqlite3.node"
+    libPath="node_modules/sqlite3/lib/binding/electron-v8.3-${platform,,}-x64/node_sqlite3.node"
     if [ "$($md5Program $libPath)" \
       == "$(cat node_modules/sqlite3/.rebuilt-for-electron)" ]; then
       info 'Skipping sqlite3 as it has already been built for electron.'

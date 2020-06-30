@@ -83,6 +83,19 @@ class Database {
         else
             return null
     }
+
+    async close(){
+        let err=null;
+        let completed=false;
+        this.db.close((e)=>{
+            err=e
+            completed=true
+        })
+        while (!completed)
+            await sleep(5)
+        if (err)
+            throw err
+    }
 }
 
 export type {Database}
@@ -117,4 +130,10 @@ export async function getDB() {
         throw db.initError
 
     return db
+}
+
+export async function closeDB() {
+    if (Database.instance===undefined)
+        return
+    await Database.instance.close()
 }
