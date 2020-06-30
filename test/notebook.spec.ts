@@ -3,18 +3,21 @@ import {tmpdir} from "os";
 import {mkdirSync, realpathSync, rmdirSync, symlinkSync, writeFileSync} from "fs";
 import {createNotebook, normalizeNotebookPath, NotebookConfig, openNotebook} from "src/common";
 import expect from 'expect'
+import {execSync} from "child_process";
 
+// @ts-ignore: TS2339. This variable is injected in setup.js
+let cleanup: boolean = global.performCleanup
 
 describe('notebook.spec.ts', () => {
     let testDir: string;
 
     beforeEach(() => {
         testDir = join(tmpdir(), 'test-rstnotes', 'test' + Math.random())
-        // console.log(testDir)
         mkdirSync(testDir, {recursive: true})
     })
 
     after(() => {
+        if (cleanup)
         rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
     })
 
@@ -92,6 +95,19 @@ describe('notebook.spec.ts', () => {
 
     it('throws an error while trying to create two notebooks with the same name at the same place', async () => {
         let notebook = await createNotebook('test notebook', testDir)
-        expect(createNotebook('test notebook', testDir)).rejects.toThrowError(/already exists/gi)
+        expect(createNotebook('test notebook', testDir)).rejects.toThrowError(/directory .+ already exists/gi)
+    })
+
+    it('throws an error while trying create a notebook with the same name as an existing file', async () => {
+        writeFileSync(join(testDir,'test-notebook'),'')
+        expect(createNotebook('test notebook', testDir)).rejects.toThrowError(/file .+ already exists/gi)
+    })
+
+    it('commits and tags config.yml correctly', async () => {
+        let notebook= await createNotebook('test',testDir)
+        notebook.config.name='test2'
+        await notebook.save()
+        let output=execSync('git --no-pager tag -l',{cwd:notebook.path,encoding:'utf8'})
+        expect(output.trim()).toBe('LastWorkingConfig')
     })
 })
