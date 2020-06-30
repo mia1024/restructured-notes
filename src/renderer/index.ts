@@ -4,7 +4,7 @@ import vuetify from "../plugins/vuetify"
 import store from "./store"
 import "./index.scss"
 import "@mdi/font/scss/materialdesignicons.scss"
-import {commitConfigFileWithSystemSignature, configDirPath, isConfigModified} from "../common"
+import {commitConfigFileAndTag, commitConfigFileWithSystemSignature, configDirPath, isConfigModified} from "../common"
 
 if (module.hot) {
     module.hot.accept()
@@ -14,7 +14,7 @@ if (module.hot) {
 window.addEventListener("beforeunload", async (e) => {
     store.state.config.save()
     if (await isConfigModified(configDirPath)){
-        await commitConfigFileWithSystemSignature(configDirPath)
+        await commitConfigFileAndTag(configDirPath)
     }
 })
 

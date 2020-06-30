@@ -1,5 +1,5 @@
 import expect from 'expect'
-import {getDB} from "src/common/db";
+import {closeDB, getDB} from "src/common/db";
 import {join} from "path";
 import {tmpdir} from "os";
 import {existsSync, mkdirSync, renameSync, rmdirSync} from "fs";
@@ -25,7 +25,8 @@ describe('src/common/db', () => {
     })
 
 
-    after(() => {
+    after(async () => {
+        await closeDB()
         if (cleanup) {
             rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
             rmdirSync(configDirPath, {recursive: true})
