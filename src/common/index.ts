@@ -28,6 +28,7 @@ export {configDirPath, configFilePath}
 export * from './utils'
 export * from "./style"
 export * from "./git"
+export * from "./db"
 
 export * from "./config"
 export * from './notebook'
