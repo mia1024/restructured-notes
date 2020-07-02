@@ -1,9 +1,8 @@
 import expect from 'expect'
-import {closeDB, getDB} from "src/common/db";
 import {join} from "path";
 import {tmpdir} from "os";
 import {existsSync, mkdirSync, renameSync, rmdirSync} from "fs";
-import {configDirPath, createNotebook, Notebook, openNotebook} from "../src/common";
+import {configDirPath, createNotebook, Notebook, openNotebook, closeDB, getDB} from "src/common";
 
 // @ts-ignore: TS2339. This variable is injected in setup.js
 let cleanup: boolean = global.performCleanup

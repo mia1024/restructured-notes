@@ -12,6 +12,7 @@ import {existsSync, lstatSync, mkdirSync, readdirSync, realpathSync} from "fs";
 import {Repository} from "nodegit";
 import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
 
+const supportedFileTypes = ['.md', '.txt']
 
 export class NotebookConfig extends FileBasedConfig {
     name!: string;
@@ -51,7 +52,7 @@ class Notebook {
     // may be encrypted
     public config!: NotebookConfig
     public path!: string;
-    public notes!: Note[]
+    public rootCollection!: Collection
     public repo!: Repository
     private _initError?: Error
     private _initCompleted: boolean = false
@@ -120,7 +121,8 @@ class Notebook {
                 return;
             }
             this.path = notebookPath
-            this.notes = []
+            this.rootCollection = new Collection(this)
+
             initRepoAndCommitAll(notebookPath, `Created notebook ${name}`).then((repo) => {
                 this.repo = repo
             }).catch(e => {
@@ -144,10 +146,7 @@ class Notebook {
                 return;
             }
             this.path = realpathSync(path)
-            this.notes = []
-            let files = readdirSync(path)
-            for (let f of files)
-                this.notes.push(new Note(f))
+            this.rootCollection = new Collection(this)
 
             openRepo(path).then((repo) => {
                 this.repo = repo
@@ -159,20 +158,6 @@ class Notebook {
         }
     }
 
-}
-
-
-class Note {
-
-    public path: string;
-
-    /**
-     *
-     * @param path: the path relative to the notebook root
-     */
-    constructor(path: string) {
-        this.path = path
-    }
 }
 
 
@@ -223,7 +208,7 @@ export async function createNotebook(name: string, path?: string) {
             return notebook
         }
         await sleep(10)
-        // this is a pretty long time??
+        // this is a long enough time?
     }
 }
 
@@ -250,6 +235,83 @@ export async function openNotebook(path: string, name?: string): Promise<Noteboo
         await sleep(10)
     }
 }
+
+
+export class Note {
+
+    public path: string;
+
+    /**
+     *
+     * @param path: the path relative to the notebook root
+     */
+    constructor(path: string) {
+        this.path = path
+    }
+}
+
+/**
+ * A Collection is a container for notes and collections.
+ * Its filesystem representation is a folder under the
+ * notebook's root directory.
+ */
+export class Collection {
+    notebook: Notebook;
+    path: string
+    parent?: Collection
+    children: (Collection | Note)[]
+
+    constructor(notebook: Notebook, parent?: Collection, name?: string) {
+        this.notebook = notebook
+        this.parent = parent
+        this.children = []
+
+        if (parent === undefined) { // root collection
+            this.path = '.'
+        } else {
+            if (name === undefined)
+                throw Error('The name of the collection must be given when parent is given')
+            this.path = joinPath(parent.path, name)
+        }
+
+        let dir = readdirSync(joinPath(this.notebook.path, this.path), {withFileTypes: true})
+        for (let fp of dir) {
+            if (fp.name === '.git') {
+                // do nothing
+            } else if (fp.isDirectory()) {
+                let col = new Collection(notebook, this, fp.name)
+                this.children.push(col)
+                // we permit the existence of potentially empty collections
+            } else if (fp.isFile()) {
+                let ext = parsePath(fp.name).ext
+                if (supportedFileTypes.includes(ext)) {
+                    // we only check it here in case the user wants to
+                    // manually add some files to the notebook
+                    let note = new Note(joinPath(this.path, fp.name))
+                    this.children.push(note)
+                }
+            }
+        }
+    }
+
+    * getAllNotes(): Generator<Note> {
+        for (let child of this.children) {
+            if (child instanceof Note) {
+                yield child
+            } else
+                yield* child.getAllNotes()
+        }
+    }
+
+    * [Symbol.iterator]() {
+        for (let child of this.children) {
+            yield child
+        }
+    }
+}
+
+
+
 
 class EncryptedNote extends Note {
     // TODO
