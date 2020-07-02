@@ -1,9 +1,18 @@
 import {join} from "path";
 import {tmpdir} from "os";
 import {mkdirSync, realpathSync, rmdirSync, symlinkSync, writeFileSync} from "fs";
-import {createNotebook, normalizeNotebookPath, NotebookConfig, openNotebook} from "src/common";
+import {
+    Collection,
+    createNotebook,
+    normalizeNotebookPath,
+    Note,
+    Notebook,
+    NotebookConfig,
+    openNotebook
+} from "src/common";
 import expect from 'expect'
 import {execSync} from "child_process";
+import Collator = Intl.Collator;
 
 // @ts-ignore: TS2339. This variable is injected in setup.js
 let cleanup: boolean = global.performCleanup
@@ -18,7 +27,7 @@ describe('notebook.spec.ts', () => {
 
     after(() => {
         if (cleanup)
-        rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
+            rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
     })
 
 
@@ -89,7 +98,7 @@ describe('notebook.spec.ts', () => {
     })
 
     it('normalizes notebook directory name correctly', function () {
-        if (process.platform=='win32')
+        if (process.platform == 'win32')
             this.skip()
         expect(normalizeNotebookPath('/home/user/restructured notes/restructured notes'))
             .toBe('/home/user/restructured notes/restructured-notes')
@@ -102,15 +111,42 @@ describe('notebook.spec.ts', () => {
     })
 
     it('throws an error while trying create a notebook with the same name as an existing file', async () => {
-        writeFileSync(join(testDir,'test-notebook'),'')
+        writeFileSync(join(testDir, 'test-notebook'), '')
         expect(createNotebook('test notebook', testDir)).rejects.toThrowError(/file .+ already exists/gi)
     })
 
     it('commits and tags config.yml correctly', async () => {
-        let notebook= await createNotebook('test',testDir)
-        notebook.config.name='test2'
+        let notebook = await createNotebook('test', testDir)
+        notebook.config.name = 'test2'
         await notebook.save()
-        let output=execSync('git --no-pager tag -l',{cwd:notebook.path,encoding:'utf8'})
+        let output = execSync('git --no-pager tag -l', {cwd: notebook.path, encoding: 'utf8'})
         expect(output.trim()).toBe('LastWorkingConfig')
+    })
+
+    it('creates collections correctly', async () => {
+        let notebook = await createNotebook('test', testDir)
+        await notebook.save()
+        mkdirSync(join(testDir, 'test', 'col1'), {recursive: true})
+        mkdirSync(join(testDir, 'test', 'col2'), {recursive: true})
+        mkdirSync(join(testDir, 'test', 'col1', 'col3'), {recursive: true})
+        writeFileSync(join(testDir, 'test', 'col1', 'col3', 'test.md'), '')
+        writeFileSync(join(testDir, 'test', 'col1', 'test2.md'), '')
+        writeFileSync(join(testDir, 'test', 'col2', 'test3.md'), '')
+        notebook = await openNotebook(testDir, 'test')
+        expect(notebook.rootCollection.path).toBe('.')
+        expect(notebook.rootCollection.parent).toBeUndefined()
+        expect(notebook.rootCollection.children.length).toBe(2)
+        expect(Array.from(notebook.rootCollection.getAllNotes()).length).toBe(3)
+        for (let note of notebook.rootCollection.getAllNotes())
+            if (process.platform == 'win32')
+                expect(['col1\\col3\\test.md', 'col1\\test2.md', 'col2\\test3.md']
+                    .includes(note.path)).toBeTruthy()
+            else
+                expect(['col1/col3/test.md', 'col1/test2.md', 'col2/test3.md']
+                    .includes(note.path)).toBeTruthy()
+
+        for (let child of notebook.rootCollection) {
+            expect(child instanceof Collection).toBeTruthy()
+        }
     })
 })
