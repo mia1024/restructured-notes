@@ -26,16 +26,16 @@ app.allowRendererProcessReuse = false
 let config:UserConfig
 
 function createMainWindow() {
-    const {width, height} = screen.getPrimaryDisplay().size
+    const {width : screenWidth, height : screenHeight} = screen.getPrimaryDisplay().size
     const window = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true,
         },
         show: false,
-        //frame: true,
-        // titleBarStyle: isMacOS ? "hiddenInset" : undefined,
-        width: width * 0.8,
-        height: height * 0.8,
+        frame: !isMacOS,
+        titleBarStyle: isMacOS ? "hiddenInset" : undefined,
+        width: screenWidth * 0.8,
+        height: screenHeight * 0.8,
         transparent:true,
         //backgroundColor: (config.useDarkMode?config.UIStyle.darkTheme:config.UIStyle.lightTheme).backgroundColor
         //icon: path.join(__dirname, "../assets/icon" + (os.platform() === "darwin" ? ".icns" : ".png"))

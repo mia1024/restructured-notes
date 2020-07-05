@@ -1,9 +1,6 @@
 <template>
-    <div id="toolbar" :style="style">
+    <div id="toolbar" v-if="isMacOS" :style="style">
         {{ title }}
-        <span v-if="isMacOS" id="toolbar-buttons">
-        <button class="toolbar-button" id="close-button" onclick="window.close()"></button>
-        </span>
     </div>
 </template>
 
@@ -42,6 +39,7 @@
         margin: 0;
         text-align: center;
         user-select: none;
+        user-input: none;
         position: absolute;
         @include shadow(4);
         //-webkit-app-region: drag;
@@ -55,14 +53,52 @@
         top: 0;
         height: 100%;
         display: flex;
-        flex-direction: row;
+        flex-direction: row-reverse;
         flex-wrap: nowrap;
     }
 
     .toolbar-button {
-        width: 2em;
-        background-color: green;
-        margin:0;
-        padding:0;
+        width: 2.5em;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        outline: none;
+
+        /*:before {*/
+        /*    content: "";*/
+        /*    display: block;*/
+        /*    padding-top: 100%*/
+        /*}*/
     }
+
+    #minimize-button {
+        background-color: yellow;
+    }
+
+    #maximize-button {
+        background-color: green;
+    }
+
+    #close-button {
+        &:before, &:after {/*
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            */
+            position: absolute;
+            /*left: 15px;*/
+            content: ' ';
+            height: 2.5em;
+            width: 2px;
+            background-color: black;
+        }
+        &:before {
+            transform: rotate(45deg);
+        }
+        &:after {
+            transform: rotate(-45deg);
+        }
+    }
+
+
 </style>
