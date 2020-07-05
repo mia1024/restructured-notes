@@ -147,6 +147,7 @@ describe('notebook.spec.ts', () => {
 
         for (let child of notebook.rootCollection) {
             expect(child instanceof Collection).toBeTruthy()
+            expect(['col1','col2','col3'].includes(child.path)).toBeTruthy()
         }
     })
 })

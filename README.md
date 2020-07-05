@@ -1,31 +1,34 @@
 # Description
 ![Test](https://github.com/pkqxdd/restructured-notes/workflows/Test/badge.svg?branch=dev)
 
-- functions
-	- markdown support - editor sync
-	- rst support - editor sync
-	- inline math?
-	- PDF import/export support
-	- Stylus support
-	- plotting
-	- concept map/flowchart (link to notes)
-	- jupyter notebook integration??? maybe this is too much
-	- Webcam support/airdrop style photo input from a phone
-- organization levels
-- sharing
-- encrypted notes (AES-256-CBC)
-- zen mode?
-- git integration: a notebook is a git repo, for version control
-- Packages
-	- fabric js
-	- tesseractjs
-	- electron
-	- editor js
-	- monaco editor for inline code blocks
-	    - potentially pop up window for easier implementation
-	- marked js
+# Run the app from source
 
-# Roadmap
+```shell script
+git clone https://github.com/pkqxdd/restructured-notes
+cd restructured-notes
+./setup_env
+yarn dev
+```
+
+On Linux, the following packages need to be installed for all native modules to compile correctly:
+
+```
+build-essential clang libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
+libkrb5-dev libdbus-1-dev libgtk-3-dev libnotify-dev libgnome-keyring-dev libasound2-dev \
+libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib curl \
+gperf bison python-dbusmock openjdk-8-jre libssl-dev libsqlite3-dev
+```
+
+It is important that you run the `setup_env` script instead of `yarn` or `npm install`, as a few dependencies 
+need to be compiled on your machine for everything to work. It is safe to run `setup_env` more than once.
+
+# Run test
+
+```shell script
+yarn test
+```
+
+# Features Roadmap 
 
 There should be at least one commit per checkbox. After completion of each checkbox item, append the commit SHA. Each version should be tagged.
 
@@ -185,34 +188,6 @@ There should be at least one commit per checkbox. After completion of each check
 	- [ ] gh sponsor
 	- [ ] web page
 	- [ ] Package and release!
-
-# Develop the app
-
-```shell script
-git clone https://github.com/pkqxdd/restructured-notes
-cd restructured-notes
-./setup_env
-yarn dev
-```
-
-On Linux, the following packages need to be installed for all native modules to compile correctly:
-
-```
-build-essential clang libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev \
-libkrb5-dev libdbus-1-dev libgtk-3-dev libnotify-dev libgnome-keyring-dev libasound2-dev \
-libcap-dev libcups2-dev libxtst-dev libxss1 libnss3-dev gcc-multilib g++-multilib curl \
-gperf bison python-dbusmock openjdk-8-jre libssl-dev libsqlite3-dev
-```
-
-It is important that you run the `setup_env` script instead of `yarn` or `npm install`, as a few dependencies 
-need to be compiled on your machine for everything to work. It is safe to run `setup_env` more than once.
-
-# Run test
-
-```shell script
-yarn test
-```
-
 
 
 # License
