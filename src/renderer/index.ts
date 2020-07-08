@@ -1,10 +1,12 @@
 import Vue from "vue"
-import App from "./App.vue"
-import vuetify from "../plugins/vuetify"
+import Index from './entry.vue'
+import vuetify from "src/plugins/vuetify"
 import store from "./store"
+import router from "./router";
 import "./index.scss"
 import "@mdi/font/scss/materialdesignicons.scss"
 import {commitConfigFileAndTag, commitConfigFileWithSystemSignature, configDirPath, isConfigModified} from "../common"
+
 
 if (module.hot) {
     module.hot.accept()
@@ -22,6 +24,7 @@ window.addEventListener("beforeunload", async (e) => {
 new Vue({
     vuetify,
     store,
-    render: h => h(App),
+    router,
+    render: h => h(Index),
 }).$mount("#app")
 
