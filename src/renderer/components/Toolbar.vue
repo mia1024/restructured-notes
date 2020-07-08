@@ -27,7 +27,6 @@
             window.close()
         }
     }
-
 </script>
 
 <style scoped lang="scss">
@@ -42,7 +41,7 @@
         user-input: none;
         position: absolute;
         @include shadow(4);
-        //-webkit-app-region: drag;
+        -webkit-app-region: drag;
         top: 0;
     }
 

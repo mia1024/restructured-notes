@@ -17,6 +17,12 @@ describe('src/common/db', () => {
         mkdirSync(configDirPath, {recursive: true})
     })
 
+    after(async () => {
+        if (cleanup) {
+            rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
+            rmdirSync(configDirPath, {recursive: true})
+        }
+    })
 
     beforeEach(() => {
         testDir = join(tmpdir(), 'test-rstnotes', 'test' + Math.random())
@@ -24,13 +30,8 @@ describe('src/common/db', () => {
     })
 
 
-    after(async () => {
-        await closeDB()
-        if (cleanup) {
-            rmdirSync(join(tmpdir(), 'test-rstnotes'), {recursive: true})
-            rmdirSync(configDirPath, {recursive: true})
-        }
-    })
+    afterEach(async () => await closeDB())
+
 
     it('opens a db without error', async () => {
         let db = await getDB()
@@ -76,7 +77,25 @@ describe('src/common/db', () => {
         notebook = await openNotebook(join(testDir, 'tes nodebook'))
         await db.addOrUpdateNotebook(notebook)
         expect(await db.getNotebookPath(notebook.config.uuid)).toBe(notebook.path)
+    })
 
+    it('getDB returns the same instance every time', async () => {
+        let db1 = await getDB()
+        let db2 = await getDB()
+        expect(db1 === db2).toBeTruthy()
+    })
 
+    it('closeDB can be called multiple times safely',async ()=>{
+        await closeDB()
+        await closeDB()
+        await getDB()
+        await closeDB()
+        await getDB()
+        await closeDB()
+        await closeDB()
+        await getDB()
+        await getDB()
+        await getDB()
+        expect(await getDB() === await getDB()).toBeTruthy()
     })
 })

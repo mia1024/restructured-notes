@@ -8,7 +8,7 @@ import {mkdirSync} from "fs";
  *  Use getDB() instead.
  */
 class Database {
-    static instance: Database
+    static instance?: Database
     private db!: sql.Database;
     private _initCompleted: boolean = false;
     private _initError?: Error | null;
@@ -136,4 +136,5 @@ export async function closeDB() {
     if (Database.instance===undefined)
         return
     await Database.instance.close()
+    Database.instance=undefined
 }
