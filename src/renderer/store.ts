@@ -30,6 +30,10 @@ const mutations = {
         state.config.useDarkMode = to
     },
 
+    updateGitConfig(state:GlobalState,v:{name?:string,email?:string,gpgsign?:boolean,useGPGAgent?:boolean}){
+        Object.assign(state.config.git,v)
+    },
+
     updateUIStyle(state: GlobalState, option: UpdateUIStyleOptions) {
         let target
         switch (option.target) {
@@ -64,6 +68,10 @@ const mutations = {
     setTitle(state: GlobalState, newTitle: string) {
         state.title = newTitle
         document.title = newTitle
+    },
+
+    setNotebookBaseDir(state:GlobalState,path:string){
+        state.config.notebookBaseDir=path
     }
 
 } //as MutationTree<GlobalState>
