@@ -62,7 +62,7 @@
     }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
     body {
         main{
             margin: 1.5em;

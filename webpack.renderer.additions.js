@@ -1,6 +1,5 @@
 const path = require('path');
 
-
 module.exports = {
     module: {
         rules: [
@@ -8,23 +7,6 @@ module.exports = {
                 test: /\.txt$/,
                 use: 'raw-loader'
             },
-            // {
-            //     test: /\.s[ca]ss$/,
-            //     use: [
-            //         'vue-style-loader',
-            //         'css-loader',
-            //         {
-            //             loader: 'sass-loader',
-            //             options: {
-            //                 implementation: require('sass'),
-            //                 sassOptions: {
-            //                     fiber: require('fibers'),
-            //                     indentedSyntax: true // optional
-            //                 },
-            //             },
-            //         },
-            //     ],
-            // },
         ],
     },
     resolve: {
@@ -35,5 +17,5 @@ module.exports = {
     },
     devServer: {
         historyApiFallback:true
-    }
+    },
 }

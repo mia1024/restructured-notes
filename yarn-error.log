@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add @types/vue-router-referer -D
+  /usr/local/bin/node /usr/local/bin/yarn add @types/vuetify -D
 
 PATH: 
   /Library/Frameworks/Python.framework/Versions/3.8/bin:/Library/Frameworks/Python.framework/Versions/3.7/bin:/usr/local:/Users/jerry/Qt/5.12.0/clang_64/bin:/Library/PostgreSQL/11/bin:/Library/Frameworks/Python.framework/Versions/3.8/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/usr/local/aria2/bin:/opt/X11/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Wireshark.app/Contents/MacOS:/Users/jerry/Desktop/restructured-notes/node_modules/.bin:/Users/jerry/Library/Android/sdk/build-tools/27.0.0:/Users/jerry/Library/Android/sdk/tools:/Users/jerry/Library/Android/sdk/platform-tools:/opt/local/bin:/opt/local/sbin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2fvue-router-referer: Not found
+  Error: https://registry.yarnpkg.com/@types%2fvuetify: Not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66987:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140748:22)
       at Request.emit (events.js:210:5)
@@ -95,6 +95,7 @@ npm manifest:
       "vue-property-decorator": "^8.5.0",
       "vue-router": "^3.3.4",
       "vue-test": "^1.0.0",
+      "vuetify-loader": "^1.6.0",
       "vuex": "^3.4.0",
       "webpack": "~4.42.1",
       "webpack-merge": "^4.2.2",
@@ -10274,6 +10275,14 @@ Lockfile:
     version "1.5.0"
     resolved "https://registry.yarnpkg.com/vuetify-loader/-/vuetify-loader-1.5.0.tgz#511173c4d1498761210708f7e475dff60fcee8bb"
     integrity sha512-JC2EVAblox2FFWE8NIUoHvQmGnnGJLrHISo2Ngciov3mWEWpt2B3qfQ3CYwmUJ7nM99DQgYDdNs26Dg3bgKzEQ==
+    dependencies:
+      file-loader "^4.0.0"
+      loader-utils "^1.2.0"
+  
+  vuetify-loader@^1.6.0:
+    version "1.6.0"
+    resolved "https://registry.yarnpkg.com/vuetify-loader/-/vuetify-loader-1.6.0.tgz#05df0805b3ab2ff0de198109d34f9da3f69da667"
+    integrity sha512-1bx3YeZ712dT1+QMX+XSFlP0O5k5O5Ui9ysBBmUZ9bWkAEHWZJQI9soI+qG5qmeFxUC0L9QYMCIKP0hOL/pf3Q==
     dependencies:
       file-loader "^4.0.0"
       loader-utils "^1.2.0"

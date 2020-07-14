@@ -1,14 +1,15 @@
 import VueRouter from "vue-router";
 import Vue from "vue"
-import {App, NotFound} from '@components'
+import {App, GettingStarted, NotFound} from '@components'
 // @ts-ignore: TS7016
 import VueRouterReferer from '@tozd/vue-router-referer'
 
 const router=new VueRouter(
     {
-        mode:'history',
+        //mode:'history',
         routes:[
-            {path:'/app',component:App},
+            {path:'/',component:App},
+            {path: '/getting-started',component: GettingStarted},
             {path:'*',component: NotFound}
         ]
     }
