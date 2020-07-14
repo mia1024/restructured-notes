@@ -5,8 +5,14 @@ import store from "./store"
 import router from "./router";
 import "./index.scss"
 import "@mdi/font/scss/materialdesignicons.scss"
-import {commitConfigFileAndTag, commitConfigFileWithSystemSignature, configDirPath, isConfigModified} from "../common"
-
+import AsyncComputedPlugin from 'vue-async-computed'
+import {
+    commitConfigFileAndTag,
+    commitConfigFileWithSystemSignature,
+    configDirPath,
+    isConfigModified, UserConfig
+} from "../common"
+import {ipcRenderer} from 'electron'
 
 if (module.hot) {
     module.hot.accept()
@@ -15,11 +21,19 @@ if (module.hot) {
 // always update with the latest copy of default configs
 window.addEventListener("beforeunload", async (e) => {
     store.state.config.save()
-    if (await isConfigModified(configDirPath)){
+    if (await isConfigModified(configDirPath)) {
         await commitConfigFileAndTag(configDirPath)
     }
 })
 
+export function restartRenderer() {
+    ipcRenderer.sendSync('restart', {immediate: true})
+}
+
+Vue.use(AsyncComputedPlugin);
+
+if ((new UserConfig()).showWelcomeScreen)
+    router.push('/getting-started')
 
 new Vue({
     vuetify,

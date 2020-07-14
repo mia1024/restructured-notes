@@ -101,5 +101,24 @@ export async function isConfigModified(repo: string | Repository) {
     }
 }
 
+export async function getGlobalUsername():Promise<string|undefined> {
+    try {
+        let path = await Git.Config.findGlobal()
+        let config = await Git.Config.openOndisk(path)
+        return (await config.getEntry('user.name')).value()
+    } catch (e) {
+        return undefined
+    }
+}
+
+export async function getGlobalEmail():Promise<string|undefined>{
+    try {
+        let path = await Git.Config.findGlobal()
+        let config = await Git.Config.openOndisk(path)
+        return (await config.getEntry('user.email')).value()
+    } catch (e) {
+        return undefined
+    }
+}
 
 export {Git}

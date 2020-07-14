@@ -76,8 +76,9 @@ export class UserConfig extends FileBasedConfig {
     }
 
 
-    // @ts-ignore: TS2376
+    // @ts-ignore TS2376
     // this is needed for UserConfig to be a singleton
+
     constructor() {
 
         if (UserConfig.instance !== undefined) {

@@ -1,4 +1,4 @@
-import {app, BrowserWindow, screen, dialog, nativeImage, shell} from "electron"
+import {app, BrowserWindow, screen, dialog, nativeImage, shell, ipcMain, nativeTheme} from "electron"
 import * as path from "path"
 import {format as formatUrl} from "url"
 import {configDirPath, configFilePath, UserConfig, initRepoAndCommitAll} from "src/common"
@@ -25,7 +25,7 @@ app.allowRendererProcessReuse = false
 
 let config:UserConfig
 
-function createMainWindow() {
+function createMainWindow(location:string='/') {
     const {width : screenWidth, height : screenHeight} = screen.getPrimaryDisplay().size
     const window = new BrowserWindow({
         webPreferences: {
@@ -36,7 +36,7 @@ function createMainWindow() {
         titleBarStyle: isMacOS ? "hiddenInset" : undefined,
         width: screenWidth * 0.8,
         height: screenHeight * 0.8,
-        transparent:true,
+        // transparent:true,
         //backgroundColor: (config.useDarkMode?config.UIStyle.darkTheme:config.UIStyle.lightTheme).backgroundColor
         //icon: path.join(__dirname, "../assets/icon" + (os.platform() === "darwin" ? ".icns" : ".png"))
     }
@@ -48,12 +48,13 @@ function createMainWindow() {
     }
 
     if (isDevelopment) {
-        window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
+        window.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}/#${location}`)
     } else {
         window.loadURL(formatUrl({
             pathname: path.join(__dirname, "index.html"),
             protocol: "file",
-            slashes: true
+            slashes: true,
+            hash:location
         }))
     }
 
@@ -90,18 +91,20 @@ app.on("activate", () => {
     }
 })
 
-// create main BrowserWindow when electron is ready
+
+
 app.on("ready", async () => {
     if (!existsSync(configDirPath)) {
         // setting up the user data directory
         mkdirSync(configDirPath, {recursive: true, mode: 0o700})
-        new UserConfig().save()
-        try {
-            await initRepoAndCommitAll(configDirPath)
-        } catch (e) {
-
-            dialog.showErrorBox("Error", e.toString())
-        }
+        let config=new UserConfig()
+        config.useDarkMode=nativeTheme.shouldUseDarkColors
+        config.save()
+        // try {
+        //     await initRepoAndCommitAll(configDirPath)
+        // } catch (e) {
+        //     dialog.showErrorBox("Error", e.toString())
+        // }
     }
 
     try {
@@ -139,3 +142,10 @@ app.on("ready", async () => {
 if (module.hot){
     module.hot.accept()
 }
+
+ipcMain.on('restart',(e,arg)=>{
+    app.relaunch()
+    if (arg.immediate){
+        app.exit(0)
+    }
+})

@@ -16,6 +16,11 @@
         components: {Toolbar: Toolbar}
     })
     export default class App extends Vue {
+        constructor() {
+            super();
+            this.$store.commit('setTitle','Restructured Notes')
+        }
+
         get globalStyle(){
             let global= {...(this.$store.state.config.UIStyle.globalStyle)}
             Object.assign(global,this.colorScheme)
@@ -44,14 +49,6 @@
 
 </script>
 
-<style type="text/scss">
-    #app {
-        transition: color 200ms ease,
-        background-color 200ms ease,
-        background 200ms ease;
-        color:var(--foreground-color);
-        background-color: var(--background-color);
-        -webkit-font-smoothing: subpixel-antialiased;
-        text-rendering: optimizeLegibility;
-    }
+<style scoped type="text/scss">
+
 </style>

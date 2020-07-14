@@ -1,6 +1,8 @@
 <template>
     <div id="toolbar" v-if="isMacOS" :style="style">
-        {{ title }}
+        <slot name="default">
+            {{ title }}
+        </slot>
     </div>
 </template>
 
@@ -63,11 +65,6 @@
         overflow: hidden;
         outline: none;
 
-        /*:before {*/
-        /*    content: "";*/
-        /*    display: block;*/
-        /*    padding-top: 100%*/
-        /*}*/
     }
 
     #minimize-button {
@@ -79,11 +76,12 @@
     }
 
     #close-button {
-        &:before, &:after {/*
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            */
+        &:before, &:after {
+            /*
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        */
             position: absolute;
             /*left: 15px;*/
             content: ' ';
@@ -91,9 +89,11 @@
             width: 2px;
             background-color: black;
         }
+
         &:before {
             transform: rotate(45deg);
         }
+
         &:after {
             transform: rotate(-45deg);
         }

@@ -6,6 +6,11 @@
     "paths": {
       "src": ["src"],
       "@components": ["src/renderer/components"]
-    }
+    },
+    "types": [
+      "vuetify",
+      "webpack-env",
+      "mocha"
+    ]
   }
 }
