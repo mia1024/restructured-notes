@@ -30,6 +30,24 @@ export function restartRenderer() {
     ipcRenderer.sendSync('restart', {immediate: true})
 }
 
+export function showErrorWindow(args:{
+    title?:string,
+    message:string,
+    detail?:string }){
+    ipcRenderer.send('error',args)
+}
+
+process.on('uncaughtException',error => {
+    console.error(error)
+    ipcRenderer.sendSync('uncaughtError',{error})
+})
+
+process.on('unhandledRejection',error => {
+    console.error(error)
+    ipcRenderer.sendSync('uncaughtError',{error})
+})
+
+
 Vue.use(AsyncComputedPlugin);
 
 if ((new UserConfig()).showWelcomeScreen)

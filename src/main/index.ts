@@ -143,9 +143,53 @@ if (module.hot){
     module.hot.accept()
 }
 
-ipcMain.on('restart',(e,arg)=>{
+ipcMain.on('restart',(e,args)=>{
     app.relaunch()
-    if (arg.immediate){
+    if (args.immediate){
         app.exit(0)
     }
+})
+
+ipcMain.on('error',(e,args)=>{
+    dialog.showMessageBoxSync(
+        mainWindow as BrowserWindow,{
+            type:'error',
+            title:args.title,
+            message:args.message,
+            detail:args.detail
+        }
+    )
+})
+
+ipcMain.on('uncaughtError',(e,args)=>{
+    showError(args.error)
+})
+
+function showError(e:Error){
+    if (mainWindow){
+        let id=dialog.showMessageBoxSync(
+            mainWindow,
+            {
+                title: 'Error!',
+                message:'Uncaught Error. Please file a bug report.',
+                detail:e.stack,
+                buttons:['Crash','Just Continue']
+            },
+        )
+        if (id==0){
+            app.exit(1)
+        }
+    } else {
+        dialog.showErrorBox('Uncaught Error. Please file a bug report.',e.stack as string)
+        app.exit(1)
+    }
+}
+
+
+process.on('unhandledRejection',((err)=>{
+    showError(err as Error)
+}))
+
+process.on('uncaughtException',(err:Error)=>{
+    showError(err)
 })
