@@ -1,5 +1,5 @@
 import Vue from "vue"
-import Vuex from "vuex"
+import Vuex, {Store} from "vuex"
 import {CSS, UserConfig} from "src/common"
 
 
@@ -72,9 +72,17 @@ const mutations = {
 
     setNotebookBaseDir(state:GlobalState,path:string){
         state.config.notebookBaseDir=path
+    },
+
+    setWelcomeScreen(state:GlobalState,to:boolean){
+        state.config.showWelcomeScreen=to
     }
 
 } //as MutationTree<GlobalState>
+
+const actions={
+
+}
 
 const state = new GlobalState
 

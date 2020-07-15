@@ -1,4 +1,6 @@
 import Git, {Repository} from "nodegit"
+import {existsSync, lstatSync, rmdirSync} from "fs";
+import {join} from "path";
 
 export const autoCommitName = "Restructured Notes"
 export const autoCommitEmail = "app@restructurednotes.com"
@@ -7,7 +9,11 @@ function getSystemSignature() {
     return Git.Signature.now(autoCommitName, autoCommitEmail)
 }
 
-export async function initRepoAndCommitAll(path: string, message?: string) {
+export async function initRepoAndCommitAll(path: string, message?: string, force=false) {
+    if (force){
+        if (existsSync(join(path,'.git'))&&lstatSync(join(path,'.git')).isDirectory())
+            rmdirSync(join(path,'.git'),{recursive:true})
+    }
     try {
         const repo = await Git.Repository.init(path, 0)
         const index = await repo.index()
