@@ -127,4 +127,12 @@ export async function getGlobalEmail():Promise<string|undefined>{
     }
 }
 
+export async function getGlobalConfigPath():Promise<string>{
+    try{
+        return await Git.Config.findGlobal()
+    } catch (e) {
+        return ''
+    }
+}
+
 export {Git}

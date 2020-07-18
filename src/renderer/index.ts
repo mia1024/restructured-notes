@@ -11,7 +11,7 @@ import {
     commitConfigFileWithSystemSignature,
     configDirPath,
     isConfigModified, UserConfig
-} from "../common"
+} from "src/common"
 import {ipcRenderer} from 'electron'
 
 if (module.hot) {
