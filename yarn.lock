@@ -990,9 +990,9 @@
   integrity sha512-ZvO2tAcjmMi8V/5Z3JsyofMe3hasRcaw88cto5etSVMwVQfeivGAlEYmaQgceUSVYFofVjT+ioHsATjdWcFt1w==
 
 "@types/node@*":
-  version "14.0.14"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.14.tgz#24a0b5959f16ac141aeb0c5b3cd7a15b7c64cbce"
-  integrity sha512-syUgf67ZQpaJj01/tRTknkMNoBBLWJOBODF0Zm4NrXmiSuxjymFrxnTu1QVYRubhVkRcZLYZG8STTwJRdVm/WQ==
+  version "14.0.23"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.23.tgz#676fa0883450ed9da0bb24156213636290892806"
+  integrity sha512-Z4U8yDAl5TFkmYsZdFPdjeMa57NOvnaf1tljHzhouaPEp7LCj2JKkejpI1ODviIAQuW4CcQmxkQ77rnLsOOoKw==
 
 "@types/node@12", "@types/node@^12.0.12":
   version "12.12.47"
@@ -1000,9 +1000,9 @@
   integrity sha512-yzBInQFhdY8kaZmqoL2+3U5dSTMrKaYcb561VU+lDzAYvqt+2lojvBEy+hmpSNuXnPTx7m9+04CzWYOUqWME2A==
 
 "@types/nodegit@^0.26.5":
-  version "0.26.5"
-  resolved "https://registry.yarnpkg.com/@types/nodegit/-/nodegit-0.26.5.tgz#f13032617da3894620b6132828f0136a65043e14"
-  integrity sha512-Dszf6yKBPLSPDC18QtY5LFRaRoE682/BHEhPQqwPtSBh0pG9uTfrhh1fnt61OSXiF8s4lBJunXbBpfwxvhQElQ==
+  version "0.26.7"
+  resolved "https://registry.yarnpkg.com/@types/nodegit/-/nodegit-0.26.7.tgz#3fc8f5108dcabddd6238509748c0e812ba02b9b7"
+  integrity sha512-qVwQupq4To/wkRtUnaiwbNhuRiVJShOG9CYIWiGdKQRkvWijtHmEnrC1KJHOVrzK04sMdHRClyecrfmN17VMFQ==
   dependencies:
     "@types/node" "*"
 
@@ -10078,6 +10078,11 @@ vue-loader@^15.9.0:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-promised@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/vue-promised/-/vue-promised-1.2.2.tgz#ee233f336820037ab01dde518dea3f91e991b9ea"
+  integrity sha512-f0uy3bOapMoKiVCRyseX3KyxWVvKL7xFccAyMFVsfc1oUaoIj0cjh9SuZQxuW8qanAgA7l+pjx7SGC8Rrm+z/Q==
 
 vue-property-decorator@^8.5.0:
   version "8.5.0"

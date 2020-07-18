@@ -7,8 +7,20 @@
                 </template>
             </toolbar>
             <div id="contents">
+                <v-card outlined style="margin-bottom: 1em">
+                    <v-card-title>
+                        Getting Started
+                    </v-card-title>
+                    <v-card-text>
+                        It appears this is the first time you use Restructured Notes.
+                        Please fill out some details below to get started. Don't worry,
+                        none of the information collected will leave your computer
+                        unless you explicitly do so (such as a cloud sync that will be supported
+                        in the future versions).
+                    </v-card-text>
+                </v-card>
 
-                <v-expansion-panels :accordion="true" :value="openPanelIdx" v-model="openPanelIdx">
+                <v-expansion-panels accordion :value="openPanelIdx" v-model="openPanelIdx" class="elevation-0">
                     <!--Theme Selection-->
                     <v-expansion-panel>
                         <v-expansion-panel-header>
@@ -66,8 +78,28 @@
                                                   type="email" validate-on-blur :rules="[validateEmail]"/>
                                 </v-col>
                             </v-row>
-                            <v-row justify="end">
-                                <v-col cols="2">
+                            <v-row justify="end" align="center">
+                                <v-col cols="4">
+                                    <v-dialog width="50vw" v-if="autoCollectedNameOrEmail">
+                                        <template v-slot:activator="{on,attrs}">
+                                            <v-btn v-bind="attrs" v-on="on" outlined x-small>How did you know this?</v-btn>
+                                        </template>
+                                        <v-card>
+                                            <v-card-title></v-card-title>
+                                            <v-card-text>
+                                                <p>
+                                                    Short answer: from <code>{{gitConfigPath}}</code>.
+                                                </p>
+                                                Since Restructured Notes heavily relies on git under the hook,
+                                                we decided it's better to match the settings here to your global git
+                                                settings, in case you want to do something else with your git
+                                                repositories.
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-dialog>
+                                </v-col>
+                                <v-spacer/>
+                                <v-col cols="auto">
                                     <v-btn @click="validateEmail()&&validateName()?openPanelIdx++:null" outlined>Next
                                     </v-btn>
                                 </v-col>
@@ -100,7 +132,7 @@
                                                   validate-on-blur
                                     />
                                 </v-col>
-                                <v-col cols="2">
+                                <v-col cols="auto">
                                     <v-btn tile outlined small @click="getDirectoryPath">&hellip;</v-btn>
                                 </v-col>
                             </v-row>
@@ -120,10 +152,17 @@
     import {Component, Vue} from "vue-property-decorator";
     import {Toolbar} from ".";
     import {restartRenderer, showErrorWindow} from "src/renderer";
-    import AsyncComputed from 'vue-async-computed-decorator'
-    import {configDirPath, getGlobalEmail, getGlobalUsername, initRepoAndCommitAll} from "src/common";
+    import {Promised} from 'vue-promised'
+    import {
+        configDirPath,
+        getGlobalConfigPath,
+        getGlobalEmail,
+        getGlobalUsername,
+        initRepoAndCommitAll
+    } from "src/common";
     import {join} from 'path'
     import {existsSync, lstatSync, mkdirSync} from "fs";
+    import AsyncComputed from "vue-async-computed-decorator";
 
     @Component({
         components: {Toolbar}
@@ -132,13 +171,30 @@
         constructor() {
             super();
             this.$store.commit('setTitle', 'Getting Started')
-            getGlobalEmail().then(v => this.$store.commit('updateGitConfig', {email: v}))
-            getGlobalUsername().then(v => this.$store.commit('updateGitConfig', {name: v}))
+            getGlobalEmail().then(v => {
+                if (v)
+                    this.$store.commit('updateGitConfig', {email: v})
+            })
+            getGlobalUsername().then(v => {
+                if (v)
+                    this.$store.commit('updateGitConfig', {name: v})
+            })
         }
 
-        private _darkThemeSelection: number | boolean = 0;
+        @AsyncComputed()
+        async gitConfigPath() {
+            return await getGlobalConfigPath()
+        }
 
-        openPanelIdx = 0
+        @AsyncComputed()
+        async autoCollectedNameOrEmail(){
+            return Boolean(await getGlobalUsername() || await getGlobalUsername())
+        }
+
+        private _darkThemeSelection: number | boolean = 0
+        public openPanelIdx = -1
+
+
 
         get refs() {
             return this.$refs
@@ -229,15 +285,15 @@
                 return
             }
             mkdirSync(this.notebookBaseDir, {recursive: true})
-            this.$store.state.config.showWelcomeScreen=false
+            this.$store.state.config.showWelcomeScreen = false
             this.$store.state.config.save()
-            initRepoAndCommitAll(configDirPath,'Config Generated in Getting Started',true).then(
-                _=>this.$router.push('/')
-            ).catch(e=>{
+            initRepoAndCommitAll(configDirPath, 'Config Generated in Getting Started', true).then(
+                _ => this.$router.push('/')
+            ).catch(e => {
                 showErrorWindow({
-                    title:"Error",
-                    message:'Cannot create git repository',
-                    detail:e.stack
+                    title: "Error",
+                    message: 'Cannot create git repository',
+                    detail: e.stack
                 })
             })
         }
