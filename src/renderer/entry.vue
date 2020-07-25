@@ -1,33 +1,18 @@
 <template>
-    <router-view :style="globalStyle"></router-view>
+    <v-app app>
+        <v-main>
+            <router-view :style="globalStyle"></router-view>
+        </v-main>
+    </v-app>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator'
 
     @Component
-    export default class index extends Vue{
-        get globalStyle(){
-            let global= {...(this.$store.state.config.UIStyle.globalStyle)}
-            Object.assign(global,this.colorScheme)
-            return global
-        }
-
-        get colorScheme() {
-            const config = this.$store.state.config
-            const cssVars: any = {}
-            let theme;
-
-            if (config.useDarkMode) {
-                theme = config.UIStyle.darkTheme
-            } else {
-                theme = config.UIStyle.lightTheme
-            }
-            cssVars['--foreground-color'] = theme.foregroundColor
-            cssVars['--background-color'] = theme.backgroundColor
-            cssVars['--accent-color'] = theme.accentColor
-            cssVars['--highlight-color'] = theme.highlightColor
-            return cssVars
+    export default class index extends Vue {
+        get globalStyle() {
+            return this.$store.state.config.UIStyle.globalStyle
         }
     }
 </script>

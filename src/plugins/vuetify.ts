@@ -1,7 +1,6 @@
 import Vue from "vue"
-import Vuetify from "vuetify"
-import "vuetify/dist/vuetify.min.css"
-import {UserConfig} from "../common";
+import Vuetify from "vuetify/lib"
+import {UserConfig} from "src/common";
 
 Vue.use(Vuetify)
 
