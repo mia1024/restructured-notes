@@ -43,6 +43,33 @@ else
 fi
 
 
+rebuild_font_scanner() {
+  npm rebuild font-scanner --target=8.3.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
+  if [ $? -ne 0 ]; then
+    errorMessage "Cannot compile font-scanner"
+    exit 1
+  fi
+  echo "$($md5Program node_modules/font-scanner/build/Release/fontmanager.node)" >node_modules/font-scanner/.rebuilt-for-electron
+}
+
+
+if [ ! -f "node_modules/font-scanner/.rebuilt-for-electron" ]; then
+  rebuild_font_scanner
+else
+  if [ "$1" != '-f' ]; then
+    if [ "$($md5Program node_modules/font-scanner/build/Release/fontmanager.node)" \
+      == "$(cat node_modules/font-scanner/.rebuilt-for-electron)" ]; then
+
+      info 'Skipping font-scanner as it has already been built for electron.'
+      info 'run setup_env -f to force rebuild'
+      info
+    else
+      rebuild_font_scanner
+    fi
+  else
+    rebuild_font_scanner
+  fi
+fi
 
 rebuild_sqlite3() {
   npm rebuild sqlite3 --target=8.2.3 --runtime=electron --dist-url='https://atom.io/download/electron' --update-binary
@@ -116,3 +143,5 @@ else
     fi
   fi
 fi
+
+

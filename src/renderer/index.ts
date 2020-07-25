@@ -50,8 +50,10 @@ process.on('unhandledRejection',error => {
 
 Vue.use(AsyncComputedPlugin);
 
-if ((new UserConfig()).showWelcomeScreen)
+let config=new UserConfig()
+if (config.showWelcomeScreen)
     router.push('/getting-started')
+Object.assign(document.documentElement.style,config.UIStyle.globalStyle)
 
 new Vue({
     vuetify,

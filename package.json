@@ -15,6 +15,7 @@
     "compile-dependencies": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "font-scanner": "^0.1.2",
     "nodegit": "^0.26.5",
     "source-map-support": "^0.5.16",
     "sqlite3": "^4.2.0"
@@ -52,7 +53,6 @@
     "mathjax": "^3.0.5",
     "mocha": "^8.0.1",
     "mochapack": "^2.0.1",
-    "node-sass": "^4.14.1",
     "openpgp": "^4.10.4",
     "raw-loader": "^4.0.1",
     "sass": "^1.26.8",
@@ -64,11 +64,13 @@
     "vue": "^2.6.11",
     "vue-async-computed": "^3.8.2",
     "vue-async-computed-decorator": "^0.0.4",
+    "vue-loader": "^15.9.3",
     "vue-promised": "^1.2.2",
     "vue-property-decorator": "^8.5.0",
     "vue-router": "^3.3.4",
     "vue-test": "^1.0.0",
     "vuetify": "^2.3.4",
+    "vuetify-loader": "^1.6.0",
     "vuex": "^3.4.0",
     "webpack": "~4.42.1",
     "webpack-merge": "^4.2.2",
