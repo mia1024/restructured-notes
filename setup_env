@@ -145,3 +145,5 @@ else
 fi
 
 
+#cd node_modules/fibers
+#../electron/dist/Electron.app/Contents/MacOS/Electron build

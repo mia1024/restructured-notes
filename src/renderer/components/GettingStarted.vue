@@ -355,7 +355,7 @@
                 return
             }
             mkdirSync(this.notebookBaseDir, {recursive: true})
-            this.$store.state.config.showWelcomeScreen = false
+            this.$store.commit('setWelcomeScreen',false)
             this.$store.state.config.save()
             initRepoAndCommitAll(configDirPath, 'Config Generated in Getting Started', true).then(
                 _ => this.$router.push('/')

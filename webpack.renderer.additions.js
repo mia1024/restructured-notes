@@ -30,7 +30,7 @@ let extraConfig = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            implementation: require('sass'),
+                            // implementation: require('sass'),
                             sassOptions: {
                                 fiber: require('fibers'),
                                 indented: false
@@ -49,7 +49,7 @@ let extraConfig = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            implementation: require('sass'),
+                            // implementation: require('sass'),
                             sassOptions: {
                                 fiber: require('fibers'),
                                 indented: false
