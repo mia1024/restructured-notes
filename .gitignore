@@ -6,3 +6,4 @@ thumbs.db
 *.env
 *.js
 *.js.map
+.bin_cache/
