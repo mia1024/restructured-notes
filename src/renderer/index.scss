@@ -6,12 +6,10 @@
   transition: color 200ms linear,
   background-color 200ms linear,
   background 200ms linear;
-  color: var(--foreground-color);
-  background-color: var(--background-color);
   -webkit-font-smoothing: subpixel-antialiased;
   text-rendering: optimizeLegibility;
 }
 
 html {
-  overflow-y: auto
+  overflow-y: auto;
 }

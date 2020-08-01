@@ -118,7 +118,7 @@
                             <v-col cols="4">
                                 <v-dialog width="50vw" v-if="autoCollectedNameOrEmail">
                                     <template v-slot:activator="{on,attrs}">
-                                        <v-btn v-bind="attrs" v-on="on" outlined x-small>How did you know this?
+                                        <v-btn v-bind="attrs" v-on="on" outlined x-small>How do you know this?
                                         </v-btn>
                                     </template>
                                     <v-card>
