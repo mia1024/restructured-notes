@@ -52,6 +52,7 @@
     "jquery": "^3.5.1",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
+    "jszip": "^3.5.0",
     "mathjax": "^3.0.5",
     "mocha": "^8.0.1",
     "mochapack": "^2.0.1",

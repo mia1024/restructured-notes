@@ -8,9 +8,23 @@ import {
     isConfigModified,
     commitConfigFileAndTag
 } from "src/common"
-import {existsSync, lstatSync, mkdirSync, readdirSync, realpathSync} from "fs";
+import {
+    existsSync,
+    lstatSync,
+    mkdirSync,
+    readdirSync,
+    readFile,
+    readFileSync,
+    realpathSync,
+    rmdirSync,
+    unlinkSync
+} from "fs";
 import {Repository} from "nodegit";
 import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
+import zipFile from "jszip"
+import {tmpdir} from "os";
+import {showErrorWindow} from "../renderer";
+import {promisify} from "util";
 
 const supportedFileTypes = ['.md', '.txt']
 
@@ -41,6 +55,7 @@ export class NotebookConfig extends FileBasedConfig {
     }
 }
 
+
 /**
  The Notebook class. Do not use the constructor.
  Use createNotebook() instead
@@ -54,8 +69,8 @@ class Notebook {
     public path!: string;
     public rootCollection!: Collection
     public repo!: Repository
-    private _initError?: Error
-    private _initCompleted: boolean = false
+    protected _initError?: Error
+    protected _initCompleted: boolean = false
 
     get initError() {
         return this._initError
@@ -160,6 +175,55 @@ class Notebook {
 
 }
 
+class compressedNotebook extends Notebook{
+    public nominalPath!:string;
+
+    constructor(path:string, create:boolean=false, name?:string,nominalPath?:string) {
+        if (create&&name) {
+            let tmpPath = joinPath(tmpdir(), 'restructured-notes', name)
+            if (existsSync(tmpPath)) {
+                showErrorWindow({
+                    title: 'Tmp directory exists',
+                    message: 'This may be a result of previous crashes. Will attempt to recover'
+                })
+                if (lstatSync(tmpPath).isDirectory())
+                    rmdirSync(tmpPath,{recursive:true})
+                else
+                    unlinkSync(tmpPath)
+            }
+            mkdirSync(tmpPath,{recursive:true})
+            super(tmpPath,create,name)
+            this.nominalPath=path
+        } else {
+            super(path) // the archive will be decompressed by openNotebook
+            if (this.initError)
+                return
+            if (!nominalPath)
+            {
+                this._initError=Error('No nominal path provided')
+                this._initCompleted=true
+                return
+            }
+            this.nominalPath=nominalPath
+        }
+    }
+
+    async save(){
+        let readFileAsync=promisify(readFile)
+        await super.save()
+        let zip=new zipFile()
+        let config=await readFileAsync(joinPath(this.path,'config.yml'))
+        zip.file('config.yml',config)
+        for (let col of this.rootCollection) {
+            if (col instanceof Note){
+                await
+                zip.file(col.path)
+            }
+        }
+        zip.generateAsync()
+    }
+
+}
 
 export type {Notebook}
 

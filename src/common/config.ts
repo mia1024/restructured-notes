@@ -136,6 +136,7 @@ class GPG {
 
 class UIStyle {
     public globalStyle: CSS = {
+        "font-family": "Courier New",
         "font-size": "16px",
         "font-weight": 300,
     }

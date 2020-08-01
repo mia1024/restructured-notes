@@ -1,5 +1,5 @@
 <template>
-    <div id="toolbar" v-if="isMacOS" :style="style">
+    <div id="toolbar" v-if="isMacOS" :style="style" class="elevation-1">
         <slot name="default">
             {{ title }}
         </slot>
@@ -8,7 +8,6 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator'
-    //import {UpdateUIStyleOptions} from "../store"
     import {CSS} from "src/common";
 
     @Component
@@ -42,7 +41,6 @@
         user-select: none;
         user-input: none;
         position: absolute;
-        @include shadow(4);
         -webkit-app-region: drag;
         top: 0;
     }
