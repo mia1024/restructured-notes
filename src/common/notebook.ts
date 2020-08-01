@@ -23,7 +23,6 @@ import {Repository} from "nodegit";
 import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
 import zipFile from "jszip"
 import {tmpdir} from "os";
-import {showErrorWindow} from "../renderer";
 import {promisify} from "util";
 
 const supportedFileTypes = ['.md', '.txt']
@@ -182,10 +181,6 @@ class compressedNotebook extends Notebook{
         if (create&&name) {
             let tmpPath = joinPath(tmpdir(), 'restructured-notes', name)
             if (existsSync(tmpPath)) {
-                showErrorWindow({
-                    title: 'Tmp directory exists',
-                    message: 'This may be a result of previous crashes. Will attempt to recover'
-                })
                 if (lstatSync(tmpPath).isDirectory())
                     rmdirSync(tmpPath,{recursive:true})
                 else
