@@ -1,5 +1,4 @@
 import expect from "expect"
-import Git from "nodegit"
 import {tmpdir} from "os"
 import {join} from 'path'
 import {mkdirSync, rmdirSync, writeFileSync,} from "fs";

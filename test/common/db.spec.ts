@@ -74,7 +74,7 @@ describe('src/common/db', () => {
         let oldPath = notebook.path
         notebook = null
         renameSync(oldPath, join(testDir, 'tes nodebook'))
-        notebook = await openNotebook(join(testDir, 'tes nodebook'))
+        notebook = await openNotebook(join(testDir, 'tes nodebook'),'path')
         await db.addOrUpdateNotebook(notebook)
         expect(await db.getNotebookPath(notebook.config.uuid)).toBe(notebook.path)
     })

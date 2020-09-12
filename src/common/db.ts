@@ -1,7 +1,6 @@
 import sql from 'sqlite3'
 import {configDirPath, Notebook, sleep} from 'src/common'
 import {join} from "path";
-import {mkdirSync} from "fs";
 
 /**
  *  Abstract interface for database connection. Do not use the constructor directly.

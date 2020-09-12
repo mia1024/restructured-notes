@@ -6,7 +6,9 @@ import {
     uuid,
     sleep,
     isConfigModified,
-    commitConfigFileAndTag
+    commitConfigFileAndTag,
+    zip,
+    unzip, addAndCommitAll, isRepoClean
 } from "src/common"
 import {
     existsSync,
@@ -21,9 +23,10 @@ import {
 } from "fs";
 import {Repository} from "nodegit";
 import {join as joinPath, parse as parsePath, resolve as resolvePath} from "path"
-import zipFile from "jszip"
 import {tmpdir} from "os";
 import {promisify} from "util";
+import zipFile from 'jszip'
+import YAML from 'yaml'
 
 const supportedFileTypes = ['.md', '.txt']
 
@@ -80,10 +83,18 @@ class Notebook {
     }
 
     async save() {
+        let userConfig = new UserConfig()
         this.config.save()
         if (await isConfigModified(this.path)) {
             await commitConfigFileAndTag(this.path)
         }
+        if (!await isRepoClean(this.repo))
+            await addAndCommitAll(
+                this.repo,
+                userConfig.git.name,
+                userConfig.git.email,
+                `Saved Notebook`
+            )
     }
 
 
@@ -145,12 +156,6 @@ class Notebook {
                 this._initCompleted = true
             })
         } else { // loading notebook
-            if (!existsSync(joinPath(path, 'config.yml')))
-                if (name) { // try a few other possible paths
-                    path = joinPath(path, name)
-                    if (!existsSync(joinPath(path, 'config.yml')))
-                        path = normalizeNotebookPath(path)
-                }
 
             try {
                 this.config = new NotebookConfig(path)
@@ -172,50 +177,60 @@ class Notebook {
         }
     }
 
+    close() {
+        // do nothing
+    }
+
 }
 
-class compressedNotebook extends Notebook{
-    public nominalPath!:string;
+class compressedNotebook extends Notebook {
+    public nominalPath!: string;
 
-    constructor(path:string, create:boolean=false, name?:string,nominalPath?:string) {
-        if (create&&name) {
-            let tmpPath = joinPath(tmpdir(), 'restructured-notes', name)
+    static async getNotebookName(path: string) {
+        let data = readFileSync(path)
+        let archive = new zipFile(data)
+        let compressedConfigFile = archive.file('config.yml')
+        if (compressedConfigFile) {
+            let content = await compressedConfigFile.async('string')
+            let obj = YAML.parse(content)
+            return obj.name
+        } else
+            throw Error('config.yml not found')
+    }
+
+    constructor(path: string, create: boolean = false, name?: string, nominalPath?: string) {
+        if (create && name) {
+            let tmpPath = joinPath(tmpdir(), 'restructured-notes','decompressed-notebooks', name)
             if (existsSync(tmpPath)) {
                 if (lstatSync(tmpPath).isDirectory())
-                    rmdirSync(tmpPath,{recursive:true})
+                    rmdirSync(tmpPath, {recursive: true})
                 else
                     unlinkSync(tmpPath)
             }
-            mkdirSync(tmpPath,{recursive:true})
-            super(tmpPath,create,name)
-            this.nominalPath=path
+            mkdirSync(tmpPath, {recursive: true})
+            super(tmpPath, create, name)
+            this.nominalPath = path
         } else {
             super(path) // the archive will be decompressed by openNotebook
             if (this.initError)
                 return
-            if (!nominalPath)
-            {
-                this._initError=Error('No nominal path provided')
-                this._initCompleted=true
+            if (!nominalPath) {
+                this._initError = Error('No nominal path provided')
+                this._initCompleted = true
                 return
             }
-            this.nominalPath=nominalPath
+            this.nominalPath = nominalPath
         }
     }
 
-    async save(){
-        let readFileAsync=promisify(readFile)
+    async save() {
+        let readFileAsync = promisify(readFile)
         await super.save()
-        let zip=new zipFile()
-        let config=await readFileAsync(joinPath(this.path,'config.yml'))
-        zip.file('config.yml',config)
-        for (let col of this.rootCollection) {
-            if (col instanceof Note){
-                await
-                zip.file(col.path)
-            }
-        }
-        zip.generateAsync()
+        await zip(this.path, this.nominalPath)
+    }
+
+    close() {
+        rmdirSync(this.path, {recursive: true})
     }
 
 }
@@ -252,14 +267,18 @@ export function normalizeNotebookPath(p: string): string {
  *
  * @param name The name of the notebook to create
  * @param path Optional. If omitted, the notebookBaseDir in user config will be used
+ * @param compressed - If the notebook should be compressed. Default to true.
  */
 
-export async function createNotebook(name: string, path?: string) {
+export async function createNotebook(name: string, path?: string, compressed: boolean = true) {
     const config = new UserConfig()
     path ??= resolvePath(config.notebookBaseDir, name)
     path = realpathSync(path)
-
-    let notebook = new Notebook(path, true, name)
+    let notebook: Notebook;
+    if (compressed)
+        notebook = new compressedNotebook(path, true, name)
+    else
+        notebook = new Notebook(path, true, name)
     while (true) {
         if (notebook.initCompleted) {
             if (notebook.initError)
@@ -271,19 +290,24 @@ export async function createNotebook(name: string, path?: string) {
     }
 }
 
-/** Opens a notebook at a specific location
- *
- * @param path the path of the notebook, or the parent folder of the notebook if name is given
- * @param name optional. the name of the notebook for additional lookup
- */
-export async function openNotebook(path: string, name?: string): Promise<Notebook> {
 
-    let notebook = new Notebook(path, false, name)
-    // this is intentionally not normalized
-    // as a user may drop a notebook folder
-    // into the app without a normalized name
-    // which would have been problematic if
-    // the path were normalized
+export async function openNotebook(path: string, mode: 'path'): Promise<Notebook>
+export async function openNotebook(uuid: string, mode: 'uuid'): Promise<Notebook>
+export async function openNotebook(arg1: string, mode: 'path' | 'uuid') {
+    let notebook: Notebook;
+    if (mode == 'path') {
+        if (lstatSync(arg1).isDirectory())
+            notebook = new Notebook(arg1, false)
+        else {
+            let name = await compressedNotebook.getNotebookName(arg1)
+            let dir = joinPath(tmpdir(), 'restructured-notes', name)
+            mkdirSync(dir,{recursive:true})
+            await unzip(arg1,dir)
+            notebook = new compressedNotebook(dir,false,name,arg1)
+        }
+    } else {
+        throw Error('Not implemented')
+    }
 
     while (true) {
         if (notebook.initCompleted) {
@@ -368,8 +392,6 @@ export class Collection {
         }
     }
 }
-
-
 
 
 class EncryptedNote extends Note {

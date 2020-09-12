@@ -135,4 +135,42 @@ export async function getGlobalConfigPath():Promise<string>{
     }
 }
 
+export async function addAndCommitAll(repo:string|Repository,name:string,email:string,commitMessage:string){
+   try {
+       if (!(repo instanceof Repository))
+           repo = await openRepo(repo)
+       let index = await repo.index()
+       await index.addAll('.')
+       await index.write()
+       let tree = await index.writeTree()
+       let head = await repo.getHeadCommit()
+       return await repo.createCommit(
+           'HEAD',
+           Git.Signature.now(name, email),
+           getSystemSignature(),
+           commitMessage,
+           tree,
+           [head]
+       )
+   } catch (e) {
+       throw e
+   }
+}
+
+export async function isRepoClean(repo:string|Repository){
+    try {
+        if (!(repo instanceof Repository))
+            repo = await openRepo(repo)
+        let status = await repo.getStatus()
+        if (status.length == 0)
+            return true
+        else
+            for (let stat of status)
+                if (stat.isModified())
+                    return false
+        return true
+    }catch (e) {
+        throw e
+    }
+}
 export {Git}

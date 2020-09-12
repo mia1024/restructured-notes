@@ -5,4 +5,4 @@ process.on('unhandledRejection', e => {
     throw e
 })
 
-global.performCleanup=true
+global.performCleanup=false
