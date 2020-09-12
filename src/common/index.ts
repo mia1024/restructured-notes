@@ -1,5 +1,6 @@
 import {join as joinPath} from "path";
 import {tmpdir} from "os";
+import {mkdirSync} from "fs";
 
 let configDirPath: string
 
@@ -15,12 +16,13 @@ switch (process.type) {
         break
     }
     default: {
-        configDirPath = tmpdir() // for testing
+        configDirPath = joinPath(tmpdir(),'restructured-notes') // for testing
     }
 }
 
 
 configDirPath = joinPath(configDirPath, "User Data")
+mkdirSync(configDirPath,{recursive:true})
 
 const configFilePath = joinPath(configDirPath, "config.yml")
 export {configDirPath, configFilePath}
@@ -29,6 +31,7 @@ export * from './utils'
 export * from "./style"
 export * from "./git"
 export * from "./db"
+export * from './zip'
 
 export * from "./config"
 export * from './notebook'

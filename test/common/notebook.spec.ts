@@ -65,8 +65,8 @@ describe('notebook.spec.ts', () => {
 
     it('loads notebook correctly', async () => {
         const notebookName = 'Test Notebook'
-        await createNotebook(notebookName, testDir)
-        let notebook = await openNotebook(testDir, notebookName)
+        await createNotebook(notebookName, testDir,false)
+        let notebook = await openNotebook(testDir,'path',notebookName)
         expect(notebook.repo).not.toBeUndefined()
         expect(notebook.initError).toBeUndefined()
         expect(notebook.initCompleted).toBeTruthy()
@@ -75,25 +75,25 @@ describe('notebook.spec.ts', () => {
     })
 
     it('throws an error when opening a blank folder as notebook', async () => {
-        await expect(openNotebook(testDir)).rejects.toThrow(/config\.yml/gi)
+        await expect(openNotebook(testDir,'path')).rejects.toThrow(/config\.yml/gi)
     })
 
     it('throws an error when opening a folder without git', async () => {
         writeFileSync(join(testDir, 'config.yml'), 'name: a\nuuid: a-b-c-d\n')
-        await expect(openNotebook(testDir)).rejects.toThrow(/repository/gi)
+        await expect(openNotebook(testDir,'path')).rejects.toThrow(/repository/gi)
     })
 
 
     it('throws an error loading notebook into a file', async () => {
         const testFile = join(testDir, 'testFile')
         writeFileSync(testFile, '')
-        await expect(createNotebook('testNotebook', testFile)).rejects.toThrow(/not a directory/gi)
+        await expect(createNotebook('testNotebook', testFile,false)).rejects.toThrow(/not a directory/gi)
     })
 
     it('creates the notebook into the real path of a symlink directory', async () => {
         mkdirSync(join(testDir, 'test'))
         symlinkSync('./test', join(testDir, 'test2'))
-        expect((await createNotebook('testNotebook', join(testDir, 'test2'))).path)
+        expect((await createNotebook('testNotebook', join(testDir, 'test2'), false)).path)
             .toBe(realpathSync(join(testDir, 'test', 'testNotebook')))
     })
 
@@ -132,7 +132,7 @@ describe('notebook.spec.ts', () => {
         writeFileSync(join(testDir, 'test', 'col1', 'col3', 'test.md'), '')
         writeFileSync(join(testDir, 'test', 'col1', 'test2.md'), '')
         writeFileSync(join(testDir, 'test', 'col2', 'test3.md'), '')
-        notebook = await openNotebook(testDir, 'test')
+        notebook = await openNotebook(testDir, 'path')
         expect(notebook.rootCollection.path).toBe('.')
         expect(notebook.rootCollection.parent).toBeUndefined()
         expect(notebook.rootCollection.children.length).toBe(2)
