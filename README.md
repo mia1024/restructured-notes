@@ -1,6 +1,14 @@
 # Description
 ![Test](https://github.com/mia1024/restructured-notes/workflows/Test/badge.svg?branch=dev)
 
+Restructured Notes is a cross-platform project aiming to replace some of the existing note-taking software. As a STEM student, I have identified several problems with all the popular note taking apps: 
+	- insufficient support with LaTeX
+	- insufficient support for handwriting
+	- insufficient support for plotting/graphing
+For most of the popular, existing apps, support for LaTeX and support for handwriting is mutually exclusive. The only one on the market that is capable of doing all of elements listed above is OneNote. However, OneNote has several issues, most notably it uses its own equation editor instead of LaTeX. More importantly, OneNote only has its full power on Windows. The flow of note taking on OneNote is also not as simple as it could be, let alone its disastrous note-to-PDF conversion when it includes any amount of handwriting. 
+
+Restructured Notes aims to combine Markdown with good handwriting support, which should provide enough flexibility for everyday note-taking purpose in a STEM class. 
+
 # Run the app from source
 
 ```shell script
