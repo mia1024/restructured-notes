@@ -3570,10 +3570,10 @@ electron-window@^0.8.0:
   dependencies:
     is-electron-renderer "^2.0.0"
 
-electron@^8.3:
-  version "8.3.3"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-8.3.3.tgz#8ce07dcbafa097d00b94d1dd58a2a3b30fe6f803"
-  integrity sha512-/LGnjnE9BQzkn2VpjflLi7jpQxYIp+maqmiDPy6ww76hkQvt/LJ991ewdHpfLR4or3VqzPIu+AK+ZJrTlDAWyw==
+electron@^11.5:
+  version "11.5.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-11.5.0.tgz#f1650543b9d8f2047d3807755bdb120153ed210f"
+  integrity sha512-WjNDd6lGpxyiNjE3LhnFCAk/D9GIj1rU3GSDealVShhkkkPR3Vh4q8ErXGDl1OAO/faomVa10KoFPUN/pLbNxg==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^12.0.12"
